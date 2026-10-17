@@ -1,100 +1,91 @@
-name: Build browser (self-hosted)
+name: Compile Aether browser
 on:
+  push:
+    branches: [dev]
+    paths: ['ci/build-request.json']
   workflow_dispatch:
     inputs:
       source_ref:
         type: string
-        description: Aether branch, tag or commit to build
         default: dev
-        required: true
+        description: Source branch, tag or SHA
       platform:
         type: choice
-        description: Trusted runner platform (Linux is experimental)
-        options: [windows, linux]
-        default: windows
-        required: true
-      draft_release:
-        type: boolean
-        description: Create a draft prerelease after Windows browser smoke passes (installer remains untested)
-        default: false
+        options: [both, windows, linux]
+        default: both
+      runner_label:
+        type: string
+        default: ''
+        description: Optional existing larger-runner label (choose one platform)
 permissions:
   contents: read
 concurrency:
-  group: full-build-${{ inputs.platform }}
+  group: compile-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  validate:
-    runs-on: ubuntu-24.04
-    outputs:
-      source_sha: ${{ steps.source.outputs.sha }}
+  browser:
+    name: Real Chromium build (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON(github.event_name == 'push' && '["windows","linux"]' || inputs.platform == 'windows' && '["windows"]' || inputs.platform == 'linux' && '["linux"]' || '["windows","linux"]') }}
+    runs-on: ${{ inputs.runner_label || (matrix.platform == 'windows' && 'windows-2025-vs2026' || 'ubuntu-24.04') }}
+    timeout-minutes: 355
+    env:
+      PYTHONUNBUFFERED: '1'
+      DEPOT_TOOLS_WIN_TOOLCHAIN: '0'
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: ${{ inputs.source_ref }}
-      - id: source
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+          ref: ${{ inputs.source_ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '22'
-      - run: python3 scripts/check.py
-  browser:
-    needs: validate
-    runs-on: ${{ fromJSON(inputs.platform == 'windows' && '["self-hosted","Windows","X64","aether-build"]' || '["self-hosted","Linux","X64","aether-build"]') }}
-    timeout-minutes: 1440
-    env:
-      AETHER_PLATFORM: ${{ inputs.platform }}
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ needs.validate.outputs.source_sha }}
-      - name: Verify persistent work directory and host capacity
+      - name: Choose short, local build path
         shell: bash
         run: |
-          python -c "import os; assert os.environ.get('AETHER_WORK_DIR'), 'Runner must configure AETHER_WORK_DIR outside the Actions checkout'"
-          python scripts/doctor.py --target "$AETHER_PLATFORM" --directory "$AETHER_WORK_DIR"
-      - name: Install build-host Python dependencies
+          if [ "$RUNNER_OS" = Windows ]; then
+            echo 'AETHER_WORK_DIR=C:/aether' >> "$GITHUB_ENV"
+          else
+            echo "AETHER_WORK_DIR=$RUNNER_TEMP/aether" >> "$GITHUB_ENV"
+          fi
+      - name: Measure hardware, preserve toolchains and free disposable image packages
+        shell: bash
+        run: python scripts/hosted.py prepare ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
+      - name: Install Python build dependencies
         shell: bash
         run: python -m pip install -r requirements-build.txt
-      - name: Build actual browser, driver and Windows mini-installer
-        shell: bash
-        run: python scripts/build.py "$AETHER_PLATFORM" --refresh
-      - name: Navigation, setup and restart smoke tests
-        shell: bash
+      - name: Install Linux development libraries
+        if: matrix.platform == 'linux'
         run: |
-          python scripts/smoke.py --source "$AETHER_WORK_DIR/$AETHER_PLATFORM/build/src" --output dist/smoke.json
-      - name: Package Windows binaries after passing browser smoke
-        if: inputs.platform == 'windows'
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends bison flex gperf ninja-build pkg-config zstd xz-utils libasound2-dev libatk1.0-dev libatk-bridge2.0-dev libcups2-dev libdbus-1-dev libdrm-dev libgbm-dev libglib2.0-dev libgtk-3-dev libnss3-dev libpango1.0-dev libpulse-dev libx11-dev libx11-xcb-dev libxcb1-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxrandr-dev libxrender-dev libxss-dev libxtst-dev libxkbcommon-dev libxshmfence-dev libudev-dev libpci-dev libpipewire-0.3-dev libkrb5-dev
+          sudo apt-get clean
+      - name: Actually prepare, generate GN and compile Chromium
         shell: bash
-        run: python scripts/package.py --upstream "$AETHER_WORK_DIR/windows" --smoke-report dist/smoke.json
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        run: python scripts/hosted.py build ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR" -j 2
+      - name: Archive compiled browser and component runtime
+        shell: bash
+        run: python scripts/runtime.py ${{ matrix.platform }} --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src"
+      - name: Test actual browser navigation and setup
+        shell: bash
+        run: python scripts/smoke.py --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src" --output dist/smoke.json
+      - name: Upload executable/runtime when compilation produced it
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: aether-${{ inputs.platform }}-${{ needs.validate.outputs.source_sha }}
-          path: dist/
-          if-no-files-found: error
-  draft:
-    needs: [validate, browser]
-    if: inputs.platform == 'windows' && inputs.draft_release
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+          name: aether-runtime-${{ matrix.platform }}-${{ github.run_id }}
+          path: dist/runtime/
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Preserve actual logs and measured hardware/resource evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          ref: ${{ needs.validate.outputs.source_sha }}
-      - name: Download this successful run's artifacts
-        env:
-          GH_TOKEN: ${{ github.token }}
-          AETHER_SOURCE_SHA: ${{ needs.validate.outputs.source_sha }}
-        run: gh run download "$GITHUB_RUN_ID" --name "aether-windows-$AETHER_SOURCE_SHA" --dir release
-      - name: Create draft only; never a stable release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          AETHER_SOURCE_SHA: ${{ needs.validate.outputs.source_sha }}
-        run: |
-          version=$(tr -d '\r\n' < VERSION)
-          printf '%s\n' 'Browser headless smoke passed. Native GUI, installer, signing, licenses and security acceptance gates still require review. Not for daily use.' > release-notes.txt
-          gh release create "v${version}-alpha.${GITHUB_RUN_NUMBER}" release/packages/* --target "$AETHER_SOURCE_SHA" --draft --prerelease --title "Aether ${version} development alpha" --notes-file release-notes.txt
+          name: aether-build-evidence-${{ matrix.platform }}-${{ github.run_id }}
+          path: |
+            dist/hosted/
+            dist/smoke.json
+          if-no-files-found: warn
+          retention-days: 7

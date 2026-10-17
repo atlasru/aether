@@ -66,7 +66,7 @@ helium_resources
     subprocess.run(["bash", "-c", script, "aether-prepare", str(platform_root)], check=True)
 
 
-def gn_arguments(platform_root, target):
+def gn_arguments(platform_root, target, *, low_resource=False):
     arguments = {}
     for filename in (platform_root / "helium-chromium/flags.gn",
                      platform_root / ("flags.windows.gn" if target == "windows" else "flags.linux.gn")):
@@ -78,6 +78,11 @@ def gn_arguments(platform_root, target):
                 arguments[key.strip()] = value.strip()
     arguments.update(target_cpu='"x64"', is_debug="false", is_component_build="false",
                      is_official_build="true")
+    if low_resource:
+        arguments.update(is_component_build="true", is_official_build="false",
+                         symbol_level="0", blink_symbol_level="0",
+                         v8_symbol_level="0", chrome_pgo_phase="0",
+                         use_thin_lto="false")
     if target == "windows":
         # No Helium signing identities or feed trust are inherited from env.
         arguments["enable_winsparkle"] = "false"
@@ -93,12 +98,16 @@ def shutil_which(name):
     return shutil.which(name)
 
 
-def build(target, work, *, prepare_only=False, refresh=False, jobs=None):
+def build(target, work, *, prepare_only=False, refresh=False, jobs=None,
+          low_resource=False, attempt=False, browser_only=False):
     prepared = (work / target / "build/src/.aether-state.json").is_file()
     preflight = inspect(target, work, minimum_disk_gib=20 if prepared else 120)
     if not preflight["ready"]:
         print(json.dumps(preflight, indent=2))
-        raise RuntimeError("Build preflight failed; source download and compilation were not started")
+        incompatible = (target == "windows" and os.name != "nt") or (target == "linux" and sys.platform != "linux")
+        if incompatible or not attempt:
+            raise RuntimeError("Build preflight failed; pass --attempt on a matching host to measure actual resource limits")
+        print("AETHER: resource preflight is advisory; attempting the actual build", flush=True)
     work.mkdir(parents=True, exist_ok=True)
     platform_root = bootstrap(target, work)
     source = platform_root / "build/src"
@@ -116,7 +125,7 @@ def build(target, work, *, prepare_only=False, refresh=False, jobs=None):
 
     output = source / "out/Default"
     output.mkdir(parents=True, exist_ok=True)
-    content = gn_arguments(platform_root, target)
+    content = gn_arguments(platform_root, target, low_resource=low_resource)
     args_file = output / "args.gn"
     if not args_file.exists() or args_file.read_text() != content:
         args_file.write_text(content, encoding="utf-8")
@@ -128,13 +137,18 @@ def build(target, work, *, prepare_only=False, refresh=False, jobs=None):
         command = [sys.executable, "third_party\\depot_tools\\autoninja.py", "-C", "out\\Default"]
         if jobs:
             command.extend(["-j", str(jobs)])
-        module._run_build_process(*command, "chrome", "chromedriver", "setup", "mini_installer")
+        targets = ["chrome", "chromedriver"]
+        if not browser_only:
+            targets += ["setup", "mini_installer"]
+        print("AETHER: starting real Windows compilation: " + " ".join(targets), flush=True)
+        module._run_build_process(*command, *targets)
     else:
         run([source / "buildtools/linux64/gn", "gen", output, "--fail-on-unused-args"], cwd=source)
         os.environ.setdefault("SISO_PATH", str(source / "third_party/siso/cipd/siso"))
         command = [sys.executable, source / "third_party/depot_tools/autoninja.py", "-C", output]
         if jobs:
             command += ["-j", str(jobs)]
+        print("AETHER: starting real Linux compilation: chrome chromedriver", flush=True)
         run(command + ["chrome", "chromedriver"], cwd=source)
     return source
 
@@ -146,11 +160,15 @@ if __name__ == "__main__":
                         default=Path(os.environ.get("AETHER_WORK_DIR", ROOT / ".work")))
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--refresh", action="store_true")
+    parser.add_argument("--low-resource", action="store_true", help="Release component build, no symbols/PGO/ThinLTO")
+    parser.add_argument("--attempt", action="store_true", help="Actually attempt on matching OS even below advisory resource minima")
+    parser.add_argument("--browser-only", action="store_true", help="Build browser and driver, omit Windows installer targets")
     parser.add_argument("-j", "--jobs", type=int)
     args = parser.parse_args()
     try:
         print(build(args.platform, args.work_dir.resolve(), prepare_only=args.prepare_only,
-                    refresh=args.refresh, jobs=args.jobs))
+                    refresh=args.refresh, jobs=args.jobs, low_resource=args.low_resource,
+                    attempt=args.attempt, browser_only=args.browser_only))
     except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
         print(f"BUILD FAILED: {exc}", file=sys.stderr)
         sys.exit(1)

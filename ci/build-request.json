@@ -1,0 +1,1 @@
+{"attempt":1,"purpose":"Compile real Windows and Linux Aether on standard GitHub-hosted runners; measure actual failures","platforms":["windows","linux"],"configuration":"release component, no symbols, PGO or ThinLTO; browser and driver only"}
