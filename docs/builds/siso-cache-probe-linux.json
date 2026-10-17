@@ -1,0 +1,28 @@
+{
+  "scope": "Local Siso/g++ tooling probe; not Chromium or a GitHub cache-service test",
+  "siso_version": "siso v1.6.1\nProdCIPD=false\ngo\tgo1.26.6\nmod\tgo.chromium.org/build/siso\t(devel)\t\nbuild\t-buildmode=exe\nbuild\t-compiler=gc\nbuild\t-trimpath=true\n",
+  "siso_sha256": "68a853bba57fda28b52912b0784a8bc2d90343182ff1a9f5c0860eff75e08b87",
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "stages": [
+    {
+      "phase": "initial",
+      "siso_exit_code": 0,
+      "local_steps": 2,
+      "program_exit_code": 0
+    },
+    {
+      "phase": "restored",
+      "siso_exit_code": 0,
+      "local_steps": 0,
+      "program_exit_code": 0
+    },
+    {
+      "phase": "changed_header",
+      "siso_exit_code": 0,
+      "local_steps": 2,
+      "program_exit_code": 7
+    }
+  ],
+  "siso_cipd_git_revision": "d38036b64e81c5fdb5d25a92081e6f98a020163d",
+  "command": "python scripts/verify_siso_cache.py --siso /path/to/pinned/siso --output .work/siso-cache.json"
+}

@@ -24,7 +24,7 @@ Status on 2026-10-17. **Not alpha-ready. No compiled Aether browser.**
 | Linux executable/package | Not produced |
 | CI | Hosted Windows/Linux full build driver running; Windows spawn defect fixed; SDK 28000 install verified on Windows; native browser result pending. Source checks remain separate. |
 
-Local checks passed: 7 Python tooling tests, 10 Node setup-state tests, compiled
+Local checks passed: 9 Python tooling tests, 10 Node setup-state tests, compiled
 C++20 policy checks covering 1,296 supported configurations, Windows/Linux exact
 patch application, actual GRIT `.pak`/URL-map compilation, and source-overlay
 refresh/idempotence/manual-edit protection. These are not browser runtime tests.
@@ -53,6 +53,8 @@ full preparation/GN/compilation. Linux attempt 1 also continues. Windows attempt
 disables PCH and fixes a secondary cp1252 logging crash. Its available log reaches
 12,115 native operations without those errors; the final result remains pending.
 Compatible out/Default caching and bounded compile windows are implemented for
-future hosted attempts; native cache save/restore remains unverified. No hosted hard resource
+future hosted attempts, including hash-gated input timestamp restoration. A local
+real Siso/g++ probe verifies unchanged output reuse and dependent-header rebuild;
+GitHub native-browser cache save/restore remains unverified. No hosted hard resource
 failure, compiled executable or runtime smoke success is yet confirmed.
 See [HOSTED_BUILDS.md](HOSTED_BUILDS.md) for measurements, run links and exact scope.

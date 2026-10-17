@@ -47,19 +47,26 @@ class OutputCacheTest(unittest.TestCase):
                 self.assertEqual(measured["output_files"], 1)
                 self.assertEqual(measured["output_logical_bytes"], output.stat().st_size)
                 code.write_text("int value = 2;")
-                self.assertNotEqual(initial["cache_prefix"], identity()["cache_prefix"])
+                changed_source = identity()
+                self.assertNotEqual(initial["cache_prefix"], changed_source["cache_prefix"])
+                self.assertEqual(initial["restore_prefix"], changed_source["restore_prefix"])
                 code.write_text("int value = 1;")
                 flags.write_text("use_sysroot = false\n")
-                self.assertNotEqual(initial["cache_prefix"], identity()["cache_prefix"])
+                self.assertNotEqual(initial["restore_prefix"], identity()["restore_prefix"])
                 flags.write_text("use_sysroot = true\n")
                 with patch.dict(os.environ, {"ImageVersion": "image-b"}):
-                    self.assertNotEqual(initial["cache_prefix"], identity()["cache_prefix"])
+                    self.assertNotEqual(initial["restore_prefix"], identity()["restore_prefix"])
                 # The generated source root is absolute and part of identity.
                 moved = root / "moved"
                 work.rename(moved)
                 hosted.cache_info("linux", moved)
                 changed = json.loads((root / "dist/hosted/output-cache.json").read_text())
                 self.assertNotEqual(initial["cache_prefix"], changed["cache_prefix"])
+                self.assertNotEqual(initial["restore_prefix"], changed["restore_prefix"])
+                (root / "upstream.lock.json").write_text('{"chromium":"different"}')
+                hosted.cache_info("linux", moved)
+                different_upstream = json.loads((root / "dist/hosted/output-cache.json").read_text())
+                self.assertNotEqual(changed["restore_prefix"], different_upstream["restore_prefix"])
                 with patch.dict(os.environ, {"ImageVersion": ""}):
                     with self.assertRaisesRegex(RuntimeError, "ImageVersion"):
                         hosted.cache_info("linux", moved)

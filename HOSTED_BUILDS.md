@@ -21,18 +21,26 @@ build. Failed preparation or linking leaves the build red.
 * Disable local sccache for the low-resource configuration to avoid duplicating
   object files on an ephemeral disk. Incremental developer builds retain out/.
 * Hosted follow-up attempts prepare the pinned source first, then restore only
-  out/Default through GitHub's native cache service. Cache identity includes the
-  actual ImageVersion, absolute source path, source/patch/build-driver fingerprint
-  and effective GN arguments. A fresh unique cache entry retains completed work
-  from failed or time-bounded compilation; modified inputs invalidate the cache.
+  out/Default through GitHub's native cache service. Compatibility includes the
+  actual ImageVersion, absolute source path, upstream pins and effective GN
+  arguments. Exact keys additionally include the source/patch/driver fingerprint;
+  a compatible fallback permits source fixes to reuse unaffected objects. GN
+  regenerates the graph and Siso validates command/dependency changes normally.
+  A fresh unique cache entry retains work from failed or time-bounded compilation.
   There is no source-tree cache and no cache in the Git repository.
+* Preparation rewrites some input mtimes even when bytes are unchanged. Record
+  these inputs' SHA-256 and nanosecond mtimes alongside out/Default. Following
+  cache restore, restore metadata only for byte-identical inputs; changed bytes
+  get fresh mtimes and no cached source contents are copied. Keep prior entries
+  across successive attempts. Pristine tarball inputs retain their archive mtimes.
+  Validate paths, schema and file hashes before applying cached metadata.
 * A hosted compile step has a 240-minute window, reserving time within the
   355-minute job for output-cache preservation and evidence uploads. Expiration
   fails the compile/job; a saved cache is not a browser artifact or build success.
   A later explicit build request with matching identity can continue incrementally.
   Actual cache size is recorded, and cache availability, quota and usefulness
-  must be verified from the native run. No successful native cache restore or
-  complete browser build is claimed by the local cache-identity test.
+  must be verified from the native run. Local Siso/cache tooling tests do not
+  verify GitHub's cache service or a complete Chromium browser build.
 * Archive runtime files, excluding obj/, gen/ and PDBs. This reduces artifact size,
   not peak compiler storage. Component builds also do not reduce source size.
 
@@ -166,3 +174,21 @@ This is observed progress, not a completed executable or a demonstrated resource
 limit. The job and the independent first Linux job are still running as of the
 19:32 UTC status check. Output-cache changes apply to future jobs and do not
 interrupt or modify either active job.
+
+## Local incremental-tooling verification
+
+Pinned Chromium DEPS selects Siso `d38036b64e81c5fdb5d25a92081e6f98a020163d`
+(v1.6.1). The local Linux package was obtained from official CIPD; binary SHA-256
+`68a853bba57fda28b52912b0784a8bc2d90343182ff1a9f5c0860eff75e08b87`.
+Run `python scripts/verify_siso_cache.py --siso /path/to/pinned/siso --output .work/siso-cache.json`.
+The tool invokes real g++ compilation/linking on a small tooling fixture, archives
+only output with GNU tar POSIX metadata, deletes the output and Siso cache,
+restores outputs and verifies input hashes/timestamps. Actual compiler/linker
+calls are counted through command instrumentation; stale Siso metrics are not
+treated as new executions. Initial build: 2 calls; restored unchanged inputs:
+0 calls; modified dependent header: 2 calls and executable returns the new value.
+This initially exposed false cache misses from rewritten input timestamps; the
+hash-gated timestamp restoration fixes that measured behavior. This is a local
+build-tool test, not an Aether executable or a GitHub cache-service verification.
+Siso quiet mode plus 30-second heartbeats is supported by this pinned binary;
+hosted attempts retain command diagnostics without per-operation console spam.

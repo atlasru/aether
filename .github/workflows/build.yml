@@ -118,6 +118,10 @@ jobs:
           key: ${{ steps.identity.outputs.cache-prefix }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             ${{ steps.identity.outputs.cache-prefix }}-
+            ${{ steps.identity.outputs.restore-prefix }}-
+      - name: Restore timestamps only for hash-verified unchanged inputs
+        shell: bash
+        run: python scripts/hosted.py restore-inputs ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
       - name: Actually generate GN and compile Chromium
         id: compile
         # Leave time to preserve real outputs and diagnostics before the job cap.
@@ -127,10 +131,17 @@ jobs:
         run: python scripts/hosted.py build ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR" -j 4
       - name: Measure actual incremental output size
         if: always() && steps.identity.outcome == 'success' && !cancelled()
+        continue-on-error: true
         shell: bash
         run: python scripts/hosted.py cache-info ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
-      - name: Preserve compiler output including an interrupted compile window
+      - name: Record input timestamps for the next incremental attempt
+        id: timestamps
         if: always() && steps.identity.outcome == 'success' && !cancelled()
+        continue-on-error: true
+        shell: bash
+        run: python scripts/hosted.py capture-inputs ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
+      - name: Preserve compiler output including an interrupted compile window
+        if: always() && steps.timestamps.outcome == 'success' && !cancelled()
         # A storage/quota failure must not prevent packaging a compiled browser.
         continue-on-error: true
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4

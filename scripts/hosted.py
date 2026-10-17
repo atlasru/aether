@@ -114,17 +114,22 @@ def prepare(target, work):
 
 def cache_info(target, work):
     # Generated commands contain absolute SDK/source paths. Never restore an
-    # output tree across images, paths, source/driver changes or GN arguments.
+    # output tree across toolchain images, upstream pins, paths or GN arguments.
+    # Siso validates source/command digests on an incremental rebuild, so source
+    # fixes can reuse unaffected objects from the same compatible configuration.
     from build import gn_arguments
     image = os.environ.get("ImageVersion")
     if not image:
         raise RuntimeError("Runner ImageVersion is required for compiled-output caching")
     source = work / target / "build/src"
     flags = gn_arguments(work / target, target, low_resource=True)
+    from common import lock
     identity = {"platform": target, "image": image, "source": str(source),
-                "fingerprint": fingerprint(), "gn_arguments": flags}
+                "upstream": lock(), "gn_arguments": flags}
     key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
-    identity["cache_prefix"] = f"aether-out-v1-{target}-{key}"
+    identity["restore_prefix"] = f"aether-out-v2-{target}-{key}"
+    identity["fingerprint"] = fingerprint()
+    identity["cache_prefix"] = identity["restore_prefix"] + "-" + identity["fingerprint"]
     output = source / "out/Default"
     count = size = 0
     if output.is_dir():
@@ -139,6 +144,7 @@ def cache_info(target, work):
     if os.environ.get("GITHUB_OUTPUT"):
         with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as stream:
             stream.write(f"cache-prefix={identity['cache_prefix']}\n")
+            stream.write(f"restore-prefix={identity['restore_prefix']}\n")
     print(json.dumps(identity, indent=2), flush=True)
 
 
@@ -190,7 +196,7 @@ def build(target, work, jobs, *, prepare_only=False):
 if __name__ == "__main__":
     configure_console()
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("select-path", "prepare", "source", "cache-info", "build"))
+    parser.add_argument("action", choices=("select-path", "prepare", "source", "cache-info", "capture-inputs", "restore-inputs", "build"))
     parser.add_argument("platform", choices=("windows", "linux"))
     parser.add_argument("--work-dir", type=Path)
     parser.add_argument("-j", "--jobs", type=int, default=2)
@@ -200,7 +206,16 @@ if __name__ == "__main__":
         sys.exit(0)
     if args.work_dir is None:
         parser.error("--work-dir is required for prepare/build")
-    if args.action == "cache-info":
+    if args.action in ("capture-inputs", "restore-inputs"):
+        import input_timestamps
+        source = args.work_dir.resolve() / args.platform / "build/src"
+        action = input_timestamps.capture if args.action == "capture-inputs" else input_timestamps.restore
+        report = action(source)
+        evidence = ROOT / "dist/hosted"
+        evidence.mkdir(parents=True, exist_ok=True)
+        (evidence / (args.action + ".json")).write_text(json.dumps(report, indent=2), encoding="utf-8")
+        print(json.dumps(report), flush=True)
+    elif args.action == "cache-info":
         cache_info(args.platform, args.work_dir.resolve())
     elif args.action == "prepare":
         prepare(args.platform, args.work_dir.resolve())

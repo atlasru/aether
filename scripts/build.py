@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 from bootstrap import bootstrap
 from common import ROOT, run
@@ -109,6 +110,7 @@ def shutil_which(name):
 
 def build(target, work, *, prepare_only=False, refresh=False, jobs=None,
           low_resource=False, attempt=False, browser_only=False):
+    preparation_started = time.time_ns()
     prepared = (work / target / "build/src/.aether-state.json").is_file()
     preflight = inspect(target, work, minimum_disk_gib=20 if prepared else 120)
     if not preflight["ready"]:
@@ -129,6 +131,9 @@ def build(target, work, *, prepare_only=False, refresh=False, jobs=None,
             prepare_linux(platform_root)
     from apply import apply
     apply(source, target, platform_root, refresh=refresh)
+    if not prepared:
+        from input_timestamps import MARKER
+        (source / MARKER).write_text(str(preparation_started), encoding="utf-8")
     if prepare_only:
         return source
 
@@ -146,6 +151,8 @@ def build(target, work, *, prepare_only=False, refresh=False, jobs=None,
         command = [sys.executable, "third_party\\depot_tools\\autoninja.py", "-C", "out\\Default"]
         if jobs:
             command.extend(["-j", str(jobs)])
+        if low_resource:
+            command.extend(["--quiet", "--heartbeat_period=30s"])
         targets = ["chrome", "chromedriver"]
         if not browser_only:
             targets += ["setup", "mini_installer"]
@@ -157,6 +164,8 @@ def build(target, work, *, prepare_only=False, refresh=False, jobs=None,
         command = [sys.executable, source / "third_party/depot_tools/autoninja.py", "-C", output]
         if jobs:
             command += ["-j", str(jobs)]
+        if low_resource:
+            command += ["--quiet", "--heartbeat_period=30s"]
         print("AETHER: starting real Linux compilation: chrome chromedriver", flush=True)
         run(command + ["chrome", "chromedriver"], cwd=source)
     return source
