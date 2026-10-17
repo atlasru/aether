@@ -88,7 +88,8 @@ def gn_arguments(platform_root, target, *, low_resource=False):
         arguments["enable_winsparkle"] = "false"
     if os.environ.get("SISO_REAPI_ADDRESS"):
         raise RuntimeError("Remote compilation needs a separately reviewed Aether runner configuration")
-    if shutil_which("sccache"):
+    if shutil_which("sccache") and not low_resource:
+        # Ephemeral component builds must not duplicate objects in a local cache.
         arguments["cc_wrapper"] = '"sccache"'
     return "\n".join(f"{key} = {value}" for key, value in sorted(arguments.items())) + "\n"
 

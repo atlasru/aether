@@ -29,8 +29,8 @@ strings include remains because other upstream string targets reference it.
    `scripts/verify_resources.py --download-grit` separately fetches Chromium's
    pinned GRIT Python dependency manifest/modules and builds a real `.pak` and
    resource map. It checks five URL paths, catching unusable WebUI mappings.
-3. Full self-hosted build: prepare Chromium, overlay Aether, GN dependency checks,
-   compile browser/driver/installer, then run browser smoke tests.
+3. Full hosted or developer-machine build: prepare Chromium, overlay Aether, GN dependency checks,
+   compile browser/driver (installer on a full Windows build), then run browser smoke tests.
 4. GUI/manual validation: native layouts at narrow widths, keyboard, screen
    reader, DPI, touch, sessions, crash recovery, extensions, downloads and installer.
 
@@ -39,10 +39,20 @@ The pinned Chromium tag resolves to commit
 full SHA rather than a moving version tag. Full preparation retains upstream's
 archive hashes and dependency configuration at the platform/common pins.
 
-The manual build workflow exists on the default branch so it can be dispatched
-without merging uncompiled browser code into `main`. It resolves `source_ref`
-once in validation, then checks out that exact SHA for build, packaging and draft
-release. Ordinary PRs never execute on the self-hosted build runner.
+The build workflow on `dev` runs on GitHub-hosted Windows/Linux images. Change
+`ci/build-request.json` to request another actual build. Manual dispatch requires
+that the workflow also exist on the repository default branch; push triggering
+does not. An optional manual `runner_label` selects a provisioned larger runner.
+No paid runner is provisioned or assumed available by the workflow.
+
+Hosted image cleanup removes only listed disposable SDK/language packages,
+preserving Visual Studio, Windows SDK, Git, Python, Node and 7-Zip. Windows uses
+`C:/aether` with long paths and inherited NTFS compression; Linux uses runner
+temporary storage. `--low-resource --browser-only --attempt -j 2` requests a
+release component browser/driver build without symbols, PGO, ThinLTO or installer.
+This avoids a large monolithic link; it does not establish that the available
+disk or six-hour hosted job limit suffices. Real resource snapshots and failures
+are retained as `aether-build-evidence-*` Actions artifacts.
 
 ## Incremental source preparation
 

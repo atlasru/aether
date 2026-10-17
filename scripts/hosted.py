@@ -57,7 +57,7 @@ def prepare(target, work):
         cache = Path(os.environ.get("RUNNER_TOOL_CACHE", r"C:\hostedtoolcache\windows"))
         paths += [cache / name for name in ("Go", "Java_Temurin-Hotspot_jdk", "Ruby", "CodeQL")]
         tools = [command([r"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe", "-all", "-format", "json"]),
-                 command(["powershell", "-NoProfile", "-Command", "Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\Include' | Select-Object Name | ConvertTo-Json"])]
+                 command(["powershell", "-NoProfile", "-Command", r"Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\Include' | Select-Object Name | ConvertTo-Json"])]
     else:
         paths = [Path(x) for x in ["/usr/local/lib/android", "/opt/ghc", "/usr/share/dotnet",
                  "/usr/local/share/powershell", "/opt/az", "/usr/local/.ghcup",

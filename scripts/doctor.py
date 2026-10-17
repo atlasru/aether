@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Report actual build capacity; never download a Chromium tree on an undersized host."""
+"""Report actual build capacity and advisory resource guardrails."""
 from __future__ import annotations
 
 import argparse
@@ -38,7 +38,7 @@ def inspect(target: str, directory: Path, minimum_disk_gib=120) -> dict:
     if memory is not None and memory < 16 * 1024**3:
         blockers.append("At least 16 GiB RAM required by Aether build preflight")
     if target == "windows" and platform.system() != "Windows":
-        blockers.append("Windows x64 build requires Windows and Visual Studio 2022 C++ / Windows SDK")
+        blockers.append("Windows x64 build requires Windows and Visual Studio 2026 C++ / Windows SDK")
     if target == "linux" and platform.system() != "Linux":
         blockers.append("Linux build requires a Linux host")
     return {"host": platform.platform(), "target": target,

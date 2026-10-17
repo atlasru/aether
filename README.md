@@ -29,8 +29,9 @@ configuration state and patch application; they do not compile Chromium.
 
 ## Windows build
 
-Use a dedicated Windows x64 machine with Visual Studio 2022 Desktop development
-with C++, the Windows SDK/components required by the pinned Chromium generation,
+Use a dedicated Windows x64 machine with Visual Studio 2026 (18.0+) Desktop development
+with C++ and MFC/ATL, Windows SDK 10.0.28000.2270 and Debugging Tools
+10.0.26100.3323+ required by the pinned Chromium revision,
 Python with `requests` and `Pillow`, Git and 7-Zip on PATH. Enable Windows long
 paths. Reserve at least 120 GiB free disk and 16 GiB RAM for the project preflight;
 32–64 GiB RAM and 250+ GiB disk are recommended. Peak requirements vary.
@@ -70,14 +71,18 @@ Linux compilation and packaging are not validated yet. See [DEVELOPMENT.md](DEVE
 
 [Source checks](https://github.com/atlasru/aether/actions/workflows/validate.yml)
 run on pushes/PRs: portable tests, actual GRIT resource compilation and exact
-Windows/Linux sparse patch checks. Full browser builds use the manual
-`Build browser (self-hosted)` workflow, with `source_ref=dev` by default. Runners
-need `self-hosted`, `aether-build`, OS and x64 labels, prerequisites and an
-`AETHER_WORK_DIR` outside the Actions checkout. Its build cache persists there.
+Windows/Linux sparse patch checks. [Compile Aether browser](https://github.com/atlasru/aether/actions/workflows/build.yml)
+uses GitHub-hosted `windows-2025-vs2026` and `ubuntu-24.04` runners. A push changing
+`ci/build-request.json` on `dev` starts both builds. Manual dispatch can select a
+platform and an existing larger-runner label. Full Chromium compilation runs,
+regardless of the advisory preflight's disk/RAM warnings (`--attempt`).
 
-Windows packaging requires real passing browser smoke and matching source/binary
-hashes. The optional release action creates only a **draft prerelease**; GUI,
-installer, signing and distribution-license review remain open. Linux currently
-uploads smoke evidence; Linux packaging/launcher integration is deferred.
+The hosted configuration uses release component builds, zero debug symbols,
+no PGO/ThinLTO and two concurrent compiler jobs. It omits installer targets and
+preserves browser features and the sandbox. Before/after runner measurements,
+periodic resource samples, build logs and GN arguments upload even on failure.
+Successful compilation archives the executable with component runtime files,
+then runs real browser smoke tests. Runtime artifacts alone do not imply that
+smoke tests passed. No stable release is automatically published.
 
 Verified scope and exact limitations: [VALIDATION.md](VALIDATION.md).
