@@ -38,6 +38,10 @@ def prepare_windows(platform_root, source):
         raise PreparationFinished()
     module._configure_remoteexec = stop_after_preparation
     previous = sys.argv
+    previous_path = sys.path.copy()
+    # Windows multiprocessing uses spawn: workers re-import name_substitution
+    # rather than inheriting our dynamically loaded upstream modules.
+    sys.path.insert(0, str(platform_root / "helium-chromium/utils"))
     try:
         sys.argv = [str(platform_root / "build.py"), "--tarball"]
         try:
@@ -46,6 +50,7 @@ def prepare_windows(platform_root, source):
             return
     finally:
         sys.argv = previous
+        sys.path[:] = previous_path
     raise RuntimeError("Locked Windows preparation hook was not reached")
 
 

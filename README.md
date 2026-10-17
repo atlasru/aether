@@ -78,7 +78,7 @@ platform and an existing larger-runner label. Full Chromium compilation runs,
 regardless of the advisory preflight's disk/RAM warnings (`--attempt`).
 
 The hosted configuration uses release component builds, zero debug symbols,
-no PGO/ThinLTO and two concurrent compiler jobs. It omits installer targets and
+no PGO/ThinLTO and four concurrent compiler jobs. It omits installer targets and
 preserves browser features and the sandbox. Before/after runner measurements,
 periodic resource samples, build logs and GN arguments upload even on failure.
 Successful compilation archives the executable with component runtime files,

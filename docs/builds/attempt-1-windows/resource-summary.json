@@ -1,0 +1,8 @@
+{
+  "samples": 40,
+  "minimum_free_bytes": 19046146048,
+  "first": "2026-10-17T14:38:51.602288+00:00",
+  "last": "2026-10-17T15:03:40.661614+00:00",
+  "scope": "C: during preparation only; compiler did not start",
+  "full_samples_artifact": "https://github.com/atlasru/aether/actions/runs/39041366048/artifacts/12104094132"
+}

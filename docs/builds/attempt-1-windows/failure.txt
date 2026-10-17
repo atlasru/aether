@@ -1,0 +1,6 @@
+Run 39041366048, Windows job 117421370226, source 2f7883f497a732b3d3d4b21a7f2e53dcece60793
+2026-10-17T15:04:03Z Found 262 .grd files to process
+2026-10-17T15:04:04Z ModuleNotFoundError: No module named name_substitution
+2026-10-17T15:04:04Z BUILD FAILED: A process in the process pool was terminated abruptly while the future was running or pending.
+
+Failure during upstream resource preparation, before GN/compiler. Not a resource exhaustion.

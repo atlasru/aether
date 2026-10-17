@@ -46,9 +46,9 @@ does not. An optional manual `runner_label` selects a provisioned larger runner.
 No paid runner is provisioned or assumed available by the workflow.
 
 Hosted image cleanup removes only listed disposable SDK/language packages,
-preserving Visual Studio, Windows SDK, Git, Python, Node and 7-Zip. Windows uses
-`C:/aether` with long paths and inherited NTFS compression; Linux uses runner
-temporary storage. `--low-resource --browser-only --attempt -j 2` requests a
+preserving Visual Studio, Windows SDK, Git, Python, Node and 7-Zip. Windows selects the measured C: or D: volume with most free space and uses
+`<drive>:/aether` with long paths and inherited NTFS compression; Linux uses runner
+temporary storage. `--low-resource --browser-only --attempt -j 4` requests a
 release component browser/driver build without symbols, PGO, ThinLTO or installer.
 This avoids a large monolithic link; it does not establish that the available
 disk or six-hour hosted job limit suffices. Real resource snapshots and failures

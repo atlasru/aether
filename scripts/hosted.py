@@ -31,6 +31,20 @@ def command(args):
         return {"command": args, "error": str(error)}
 
 
+def select_path(target):
+    if target == "windows":
+        # Probe real volumes. The 20261007 VS2026 image provides a large D:
+        # workspace disk; older images may only provide C:. Never assume either.
+        candidates = [p for p in (Path("C:/"), Path("D:/")) if p.is_dir()]
+        drive = max(candidates, key=lambda p: shutil.disk_usage(p).free)
+        work = drive / "aether"
+    else:
+        work = Path(os.environ["RUNNER_TEMP"]) / "aether"
+    with Path(os.environ["GITHUB_ENV"]).open("a", encoding="utf-8") as stream:
+        stream.write(f"AETHER_WORK_DIR={work.as_posix()}\n")
+    print(f"AETHER: selected {work} with {shutil.disk_usage(work.anchor or work.parent).free} free bytes", flush=True)
+
+
 def snapshot(target, work):
     report = inspect(target, work)
     report.update(time=datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -132,11 +146,16 @@ def build(target, work, jobs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("prepare", "build"))
+    parser.add_argument("action", choices=("select-path", "prepare", "build"))
     parser.add_argument("platform", choices=("windows", "linux"))
-    parser.add_argument("--work-dir", type=Path, required=True)
+    parser.add_argument("--work-dir", type=Path)
     parser.add_argument("-j", "--jobs", type=int, default=2)
     args = parser.parse_args()
+    if args.action == "select-path":
+        select_path(args.platform)
+        sys.exit(0)
+    if args.work_dir is None:
+        parser.error("--work-dir is required for prepare/build")
     if args.action == "prepare":
         prepare(args.platform, args.work_dir.resolve())
     else:

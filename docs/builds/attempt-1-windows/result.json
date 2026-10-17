@@ -1,0 +1,52 @@
+{
+  "command": [
+    "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+    "-u",
+    "D:\\a\\aether\\aether\\scripts\\build.py",
+    "windows",
+    "--work-dir",
+    "C:\\aether",
+    "--attempt",
+    "--low-resource",
+    "--browser-only",
+    "-j",
+    "2"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 1512.609,
+  "final": {
+    "host": "Windows-2025Server-10.0.26100-SP0",
+    "target": "windows",
+    "free_disk_bytes": 19981160448,
+    "physical_memory_bytes": 17174360064,
+    "tools": {
+      "git": "C:\\Program Files\\Git\\ucrt64\\bin\\git.EXE",
+      "python3": "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python3.EXE",
+      "patch": "C:\\Program Files\\Git\\usr\\bin\\patch.EXE",
+      "clang++": "C:\\Program Files\\LLVM\\bin\\clang++.EXE",
+      "g++": "C:\\mingw64\\bin\\g++.EXE",
+      "ninja": "C:\\ProgramData\\Chocolatey\\bin\\ninja.EXE",
+      "docker": "C:\\Windows\\system32\\docker.EXE"
+    },
+    "blockers": [
+      "At least 120 GiB free disk required by Aether build preflight",
+      "At least 16 GiB RAM required by Aether build preflight"
+    ],
+    "ready": false,
+    "time": "2026-10-17T15:04:04.167178+00:00",
+    "cpu_count": 4,
+    "runner_image": "20261007.264.1",
+    "runner_os": "Windows",
+    "system": {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; Get-Volume | Select-Object DriveLetter,FileSystem,Size,SizeRemaining | ConvertTo-Json"
+      ],
+      "exit_code": 0,
+      "output": "{\n    \"TotalVisibleMemorySize\":  16771836,\n    \"FreePhysicalMemory\":  12882460\n}\n[\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"FAT32\",\n        \"Size\":  99614720,\n        \"SizeRemaining\":  63649280\n    },\n    {\n        \"DriveLetter\":  \"C\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  160467759104,\n        \"SizeRemaining\":  20063993856\n    },\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  471855104,\n        \"SizeRemaining\":  457297920\n    },\n    {\n        \"DriveLetter\":  \"D\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  236205371392,\n        \"SizeRemaining\":  236075364352\n    }\n]\n"
+    }
+  },
+  "scope": "Actual upstream source preparation, GN and Chromium compilation attempt"
+}

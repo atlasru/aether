@@ -19,16 +19,45 @@ on:
         description: Optional existing larger-runner label (choose one platform)
 permissions:
   contents: read
-concurrency:
-  group: compile-${{ github.ref }}
-  cancel-in-progress: false
 jobs:
+  request:
+    name: Select actual build targets
+    runs-on: ubuntu-24.04
+    outputs:
+      platforms: ${{ steps.select.outputs.platforms }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+          persist-credentials: false
+      - id: select
+        env:
+          REQUESTED_PLATFORM: ${{ inputs.platform || 'both' }}
+        run: |
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          selected = os.environ['REQUESTED_PLATFORM']
+          platforms = (json.loads(Path('ci/build-request.json').read_text())['platforms']
+                       if os.environ['GITHUB_EVENT_NAME'] == 'push'
+                       else ['windows', 'linux'] if selected == 'both' else [selected])
+          if (not isinstance(platforms, list) or not platforms or
+              len(set(platforms)) != len(platforms) or
+              any(p not in ('windows', 'linux') for p in platforms)):
+              raise ValueError('Build request must select windows and/or linux')
+          with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
+              out.write('platforms=' + json.dumps(platforms) + '\n')
+          PYTHON
   browser:
+    needs: request
+    concurrency:
+      group: compile-${{ github.ref }}-${{ matrix.platform }}
+      cancel-in-progress: false
     name: Real Chromium build (${{ matrix.platform }})
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJSON(github.event_name == 'push' && '["windows","linux"]' || inputs.platform == 'windows' && '["windows"]' || inputs.platform == 'linux' && '["linux"]' || '["windows","linux"]') }}
+        platform: ${{ fromJSON(needs.request.outputs.platforms) }}
     runs-on: ${{ inputs.runner_label || (matrix.platform == 'windows' && 'windows-2025-vs2026' || 'ubuntu-24.04') }}
     timeout-minutes: 355
     env:
@@ -42,17 +71,19 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
-      - name: Choose short, local build path
+      - name: Choose short build path on the measured volume with most free space
         shell: bash
-        run: |
-          if [ "$RUNNER_OS" = Windows ]; then
-            echo 'AETHER_WORK_DIR=C:/aether' >> "$GITHUB_ENV"
-          else
-            echo "AETHER_WORK_DIR=$RUNNER_TEMP/aether" >> "$GITHUB_ENV"
-          fi
+        run: python scripts/hosted.py select-path ${{ matrix.platform }}
       - name: Measure hardware, preserve toolchains and free disposable image packages
         shell: bash
         run: python scripts/hosted.py prepare ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
+      - name: Preserve initial measured runner capacity before the long build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aether-runner-${{ matrix.platform }}-${{ github.run_id }}
+          path: dist/hosted/
+          if-no-files-found: error
+          retention-days: 7
       - name: Install Python build dependencies
         shell: bash
         run: python -m pip install -r requirements-build.txt
@@ -64,7 +95,7 @@ jobs:
           sudo apt-get clean
       - name: Actually prepare, generate GN and compile Chromium
         shell: bash
-        run: python scripts/hosted.py build ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR" -j 2
+        run: python scripts/hosted.py build ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR" -j 4
       - name: Archive compiled browser and component runtime
         shell: bash
         run: python scripts/runtime.py ${{ matrix.platform }} --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src"
