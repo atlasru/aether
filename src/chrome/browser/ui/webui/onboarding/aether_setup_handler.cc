@@ -80,9 +80,13 @@ void AetherSetupHandler::HandleApply(const base::ListValue& args) {
                      args[0].Clone()));
 }
 
-void AetherSetupHandler::OnApplied(base::Value callback) {
+void AetherSetupHandler::OnApplied(base::Value callback, std::string error) {
   applying_ = false;
   if (IsJavascriptAllowed()) {
-    ResolveJavascriptCallback(callback, base::Value(true));
+    if (error.empty()) {
+      ResolveJavascriptCallback(callback, base::Value(true));
+    } else {
+      RejectJavascriptCallback(callback, base::Value(error));
+    }
   }
 }

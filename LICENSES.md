@@ -18,6 +18,9 @@ The locked dependency set includes GPL-3.0 uBlock Origin 1.75.0 from Helium's fo
 its separately licensed filter assets, and `helium-nonfree-assets` search-engine
 data. The name of a repository is not a license grant. Search-data and filter
 asset redistribution terms require an explicit review before binary release.
+The inspected `helium-nonfree-assets/nonfree/COPYRIGHT` explicitly says its notice
+does not grant downstream rights to the logos/marks. Aether's replacement setup
+uses none of those onboarding logos; native search-engine logos remain upstream.
 Proprietary codec/patent and optional DRM availability also depend on platform
 and distribution terms; compilation flags do not grant redistribution rights.
 

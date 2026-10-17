@@ -1,0 +1,15 @@
+{
+  "result": "passed",
+  "scope": "Actual Chromium GRIT resource compilation; browser not compiled",
+  "chromium_revision": "5869fe313571d75152b77813cf0a4ee26a4e6df0",
+  "paths": [
+    "index.html",
+    "setup.css",
+    "setup.js",
+    "state.mjs",
+    "aether.svg"
+  ],
+  "pak_bytes": 9488,
+  "pak_sha256": "fdc48bf7632ad1096ff6e29775de672a8dd0ad334b91d1f2a7db72443407b755",
+  "resource_map_sha256": "83c49b3154b72d8fa351fc4c36f4e269564af99d84b2e3e239d2eb54b2902882"
+}

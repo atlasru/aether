@@ -22,6 +22,14 @@ Status on 2026-10-17. **Not alpha-ready. No compiled Aether browser.**
 | Auto-updates/signing | Not implemented; Helium update fetch explicitly blocked |
 | Windows executable/installer | Not produced |
 | Linux executable/package | Not produced |
+| CI | Hosted source/resource/patch workflows and manual self-hosted full-build pipeline implemented; see VALIDATION.md for observed run status |
+
+Local checks passed: 4 Python tooling tests, 10 Node setup-state tests, compiled
+C++20 policy checks covering 1,296 supported configurations, Windows/Linux exact
+patch application, actual GRIT `.pak`/URL-map compilation, and source-overlay
+refresh/idempotence/manual-edit protection. These are not browser runtime tests.
+Linux profile isolation is patched; Linux executable/desktop/package naming is
+still inherited and requires finishing before a Linux release.
 
 ## Alpha gates still open
 

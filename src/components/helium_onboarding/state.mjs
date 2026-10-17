@@ -20,7 +20,7 @@ export class SetupModel {
     const version = state.version ?? 0;
     this.readOnly = !Number.isInteger(version) || version < 0 || version > SCHEMA || !!state.readOnly;
     this.config = {...(validConfig(state.draft) ? state.draft : DEFAULTS)};
-    this.step = !state.completed && Number.isInteger(state.step) && state.step >= 0 &&
+    this.step = (!state.completed || state.editing) && Number.isInteger(state.step) && state.step >= 0 &&
       state.step <= 5 ? state.step : 0;
   }
   update(key, value) {

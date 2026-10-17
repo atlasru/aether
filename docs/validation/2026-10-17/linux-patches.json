@@ -1,0 +1,59 @@
+{
+  "scope": "Sparse patch application only; no GN, C++ browser compilation or runtime validation",
+  "platform": "linux",
+  "upstream": {
+    "schema": 1,
+    "chromium": "155.0.8059.84",
+    "chromium_revision": "5869fe313571d75152b77813cf0a4ee26a4e6df0",
+    "helium_version": "0.19.4.1",
+    "inspected_at": "2026-10-17",
+    "repositories": {
+      "helium": {
+        "url": "https://github.com/imputnet/helium.git",
+        "revision": "832faa7822566270e10c0d3262f702f9d0fea81f"
+      },
+      "windows": {
+        "url": "https://github.com/imputnet/helium-windows.git",
+        "revision": "11a292ea63c107e8ed7f5edb5883df10f977b845"
+      },
+      "linux": {
+        "url": "https://github.com/imputnet/helium-linux.git",
+        "revision": "cf878d4aaff58d063beada276c437ae756a142aa"
+      }
+    }
+  },
+  "baseline_sha256": {
+    "chrome/app/theme/chromium/BRANDING": "d6d15e4d89789121446212243f99b1ad6c9f72a77b15610fdc7a1cc4b58e841e",
+    "chrome/browser/resources/settings/privacy_page/services_page.html": "006dc5950e92208fd000ecb64696a5010eee13cfb644dd43da17b05fe8171af0",
+    "chrome/browser/resources/tab_search/tab_search_item.ts": "01644a2a78f75c98ab36cdd1e1413cf36b9234ca01344d5a6c66b04e3ecbd4b4",
+    "chrome/browser/ui/browser_ui_prefs.cc": "e8491774db5501e4a0eec3324fcfe61158038fb45db058cdcd3c015ea63db04c",
+    "chrome/browser/ui/startup/BUILD.gn": "f90cc7753f5e7a65c94e53c680a7e1e7494f78472463eb5d769e06d16d4920a9",
+    "chrome/browser/ui/startup/startup_browser_creator_impl.cc": "4becf69f50832b67f65340f36460971b22ce1c8e8bfca8de34a60ca84314aa63",
+    "chrome/browser/ui/tabs/tab_strip_prefs.cc": "3685ad1ecaa760d284cc75acb000e5df37253aa5af2f10f609ec0cefeb2abb6e",
+    "chrome/browser/ui/views/toolbar/toolbar_view.cc": "a829c321b754b6beaa0209654adb8404a8b08cdcdf2e7e5015bb6aea53c81091",
+    "chrome/browser/ui/views/toolbar/toolbar_view.h": "7c79095ff698b8dd7c5b5fc3c20cdefd2808aaccc50df4057fd9bd1d162cb9df",
+    "chrome/browser/ui/webui/BUILD.gn": "a1c689f3d1b3eda6bb23872d7d6dcbb52e551dcdc2c554752888aa41ead41cac",
+    "chrome/browser/ui/webui/onboarding/onboarding_page_ui.cc": "cff0d819681a7be6fbe2404b02ecf5108812be902c15d7e467d31cdef6a0a6e5",
+    "chrome/common/chrome_paths_linux.cc": "5b10069f4a64a1820c069b7015b6b69f58f2c015e66006635a75be1c2b6153a7",
+    "components/helium_services/helium_services_helpers.cc": "83681f18b4c5ddfcc112e0043eb21809a5ee7c5cf7917bb4ef4910e0ca7ae9c0",
+    "components/omnibox/browser/builtin_provider.cc": "a5e3b91ccf7de22c84e146b4390e54b1c198140ee134c0cd5a76672387672c8d",
+    "components/url_formatter/url_fixer.cc": "3a62674df0bb8977a7f42b0d3691d51ebde7e589c57e7aff02d8ed67d3a7372d",
+    "content/public/common/url_constants.h": "763bddf211f5b2e7e3ef0f4acbcefbba1bec9c95dad1ed618ee88ce81843e54c"
+  },
+  "patches": [
+    "patches/common/0001-product-identity.patch",
+    "patches/common/0002-native-setup.patch",
+    "patches/common/0003-toolbar-density.patch",
+    "patches/common/0004-update-isolation.patch",
+    "patches/linux/0001-profile-isolation.patch"
+  ],
+  "result": "passed",
+  "source_fingerprint": "d8da966548edd4e5920031e489e4dd622c80bee998744bbc7558c33d3654dec2",
+  "patch_sha256": {
+    "patches/common/0001-product-identity.patch": "6f007a6e982ccee3d1fd7fd797c2f14a911b7c16c3534870229e24a0f3acc8f2",
+    "patches/common/0002-native-setup.patch": "06146f4e60e64f53f2b7ffdd36f37a2dd2af0c3e17393e3ed982b86075aca771",
+    "patches/common/0003-toolbar-density.patch": "350720ebf21396411d9103a82c7c58f4e698e9f79fa9c4e555c6a8be4eac3443",
+    "patches/common/0004-update-isolation.patch": "8e75761805442aa23fcf1ff90967b8952b0426db11a3489e3c622fbce08f52b4",
+    "patches/linux/0001-profile-isolation.patch": "d209e1c8a7ed6853b48fcadd4a020ed5c94d965c5c91c49fe28954d81517847a"
+  }
+}

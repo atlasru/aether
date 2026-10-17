@@ -1,0 +1,29 @@
+test_git_apply_works_in_tarball_nested_under_another_git_repo (test_tooling.ToolingTest.test_git_apply_works_in_tarball_nested_under_another_git_repo) ... ok
+test_grit_resources_have_local_paths_and_stable_index (test_tooling.ToolingTest.test_grit_resources_have_local_paths_and_stable_index) ... ok
+test_no_engine_or_sandbox_modifications (test_tooling.ToolingTest.test_no_engine_or_sandbox_modifications) ... ok
+test_pins_are_full_and_platforms_have_patch_series (test_tooling.ToolingTest.test_pins_are_full_and_platforms_have_patch_series) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.017s
+
+OK
+✔ first run and v0 migration select safe defaults (1.384888ms)
+✔ saved choices and back navigation survive reload (0.192493ms)
+✔ newer or malformed schema cannot overwrite preferences (0.337867ms)
+✔ corrupt drafts recover without inventing selections (0.217059ms)
+✔ unsupported input is rejected without modifying the last valid state (0.315284ms)
+✔ all interface presets preserve independent resource choices (0.197921ms)
+✔ snapshots own their data; queued saves cannot change under later edits (0.179074ms)
+✔ reopening completed setup starts at welcome with saved selections (0.12217ms)
+✔ an interrupted edit after initial setup resumes the saved draft and step (0.272391ms)
+✔ step limits hold under malformed persisted state and navigation (0.31992ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 111.830467
+PASS: 1296 valid configurations; range and schema rejection
+PASS: repository tooling, setup state and portable C++ policy. Chromium integration remains separate.

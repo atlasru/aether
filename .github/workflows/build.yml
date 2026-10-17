@@ -1,0 +1,100 @@
+name: Build browser (self-hosted)
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        type: string
+        description: Aether branch, tag or commit to build
+        default: dev
+        required: true
+      platform:
+        type: choice
+        description: Trusted runner platform (Linux is experimental)
+        options: [windows, linux]
+        default: windows
+        required: true
+      draft_release:
+        type: boolean
+        description: Create a draft prerelease after Windows browser smoke passes (installer remains untested)
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: full-build-${{ inputs.platform }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_ref }}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: python3 scripts/check.py
+  browser:
+    needs: validate
+    runs-on: ${{ fromJSON(inputs.platform == 'windows' && '["self-hosted","Windows","X64","aether-build"]' || '["self-hosted","Linux","X64","aether-build"]') }}
+    timeout-minutes: 1440
+    env:
+      AETHER_PLATFORM: ${{ inputs.platform }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.validate.outputs.source_sha }}
+      - name: Verify persistent work directory and host capacity
+        shell: bash
+        run: |
+          python -c "import os; assert os.environ.get('AETHER_WORK_DIR'), 'Runner must configure AETHER_WORK_DIR outside the Actions checkout'"
+          python scripts/doctor.py --target "$AETHER_PLATFORM" --directory "$AETHER_WORK_DIR"
+      - name: Install build-host Python dependencies
+        shell: bash
+        run: python -m pip install -r requirements-build.txt
+      - name: Build actual browser, driver and Windows mini-installer
+        shell: bash
+        run: python scripts/build.py "$AETHER_PLATFORM" --refresh
+      - name: Navigation, setup and restart smoke tests
+        shell: bash
+        run: |
+          python scripts/smoke.py --source "$AETHER_WORK_DIR/$AETHER_PLATFORM/build/src" --output dist/smoke.json
+      - name: Package Windows binaries after passing browser smoke
+        if: inputs.platform == 'windows'
+        shell: bash
+        run: python scripts/package.py --upstream "$AETHER_WORK_DIR/windows" --smoke-report dist/smoke.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: aether-${{ inputs.platform }}-${{ needs.validate.outputs.source_sha }}
+          path: dist/
+          if-no-files-found: error
+  draft:
+    needs: [validate, browser]
+    if: inputs.platform == 'windows' && inputs.draft_release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.validate.outputs.source_sha }}
+      - name: Download this successful run's artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AETHER_SOURCE_SHA: ${{ needs.validate.outputs.source_sha }}
+        run: gh run download "$GITHUB_RUN_ID" --name "aether-windows-$AETHER_SOURCE_SHA" --dir release
+      - name: Create draft only; never a stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AETHER_SOURCE_SHA: ${{ needs.validate.outputs.source_sha }}
+        run: |
+          version=$(tr -d '\r\n' < VERSION)
+          printf '%s\n' 'Browser headless smoke passed. Native GUI, installer, signing, licenses and security acceptance gates still require review. Not for daily use.' > release-notes.txt
+          gh release create "v${version}-alpha.${GITHUB_RUN_NUMBER}" release/packages/* --target "$AETHER_SOURCE_SHA" --draft --prerelease --title "Aether ${version} development alpha" --notes-file release-notes.txt

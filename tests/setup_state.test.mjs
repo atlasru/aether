@@ -71,6 +71,12 @@ test('reopening completed setup starts at welcome with saved selections', () => 
   assert.equal(model.step, 0);
   assert.equal(model.config.layout, 2);
 });
+test('an interrupted edit after initial setup resumes the saved draft and step', () => {
+  const model = new SetupModel({completed: true, editing: true, step: 3,
+    draft: {...DEFAULTS, appearance: 2}});
+  assert.equal(model.step, 3);
+  assert.equal(model.config.appearance, 2);
+});
 test('step limits hold under malformed persisted state and navigation', () => {
   for (const step of [-1, 6, '3', NaN, 1.5]) {
     assert.equal(new SetupModel({step}).step, 0);

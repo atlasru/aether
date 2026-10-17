@@ -94,7 +94,8 @@ def shutil_which(name):
 
 
 def build(target, work, *, prepare_only=False, refresh=False, jobs=None):
-    preflight = inspect(target, work if work.exists() else ROOT)
+    prepared = (work / target / "build/src/.aether-state.json").is_file()
+    preflight = inspect(target, work, minimum_disk_gib=20 if prepared else 120)
     if not preflight["ready"]:
         print(json.dumps(preflight, indent=2))
         raise RuntimeError("Build preflight failed; source download and compilation were not started")

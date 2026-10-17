@@ -3,6 +3,8 @@
 #ifndef CHROME_BROWSER_UI_WEBUI_ONBOARDING_AETHER_SETUP_HANDLER_H_
 #define CHROME_BROWSER_UI_WEBUI_ONBOARDING_AETHER_SETUP_HANDLER_H_
 
+#include <string>
+
 #include "base/memory/weak_ptr.h"
 #include "content/public/browser/web_ui_message_handler.h"
 
@@ -16,7 +18,7 @@ class AetherSetupHandler : public content::WebUIMessageHandler {
   void HandleGet(const base::ListValue& args);
   void HandleSave(const base::ListValue& args);
   void HandleApply(const base::ListValue& args);
-  void OnApplied(base::Value callback);
+  void OnApplied(base::Value callback, std::string error);
   bool applying_ = false;
   base::WeakPtrFactory<AetherSetupHandler> weak_factory_{this};
 };

@@ -1,0 +1,21 @@
+{
+  "host": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "target": "windows",
+  "free_disk_bytes": 31922552832,
+  "physical_memory_bytes": 10451439616,
+  "tools": {
+    "git": "/usr/local/bin/git",
+    "python3": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "patch": "/usr/bin/patch",
+    "clang++": null,
+    "g++": "/usr/bin/g++",
+    "ninja": null,
+    "docker": null
+  },
+  "blockers": [
+    "At least 120 GiB free disk required by Aether build preflight",
+    "At least 16 GiB RAM required by Aether build preflight",
+    "Windows x64 build requires Windows and Visual Studio 2022 C++ / Windows SDK"
+  ],
+  "ready": false
+}

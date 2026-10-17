@@ -3,6 +3,7 @@
 #include "chrome/browser/aether/preferences.h"
 
 #include <utility>
+#include <limits>
 
 #include "base/check.h"
 #include "base/functional/bind.h"
@@ -23,33 +24,52 @@ namespace {
 // A pending journal is replayed after a crash; finished journals are never
 // replayed, so subsequent edits in Chromium Settings remain authoritative.
 bool CanUseState(const base::DictValue& state) {
-  return CanReadSchema(state.FindInt("version").value_or(0));
+  const auto* version = state.Find("version");
+  return !version || (version->is_int() && CanReadSchema(version->GetInt()));
 }
 
-void FinishJournal(base::WeakPtr<Profile> profile, base::OnceClosure done) {
+void FinishJournal(base::WeakPtr<Profile> profile, int generation,
+                   ApplyCallback done) {
   if (!profile) {
     return;
   }
   auto* prefs = profile->GetPrefs();
   auto state = prefs->GetDict(kSetupPref).Clone();
+  if (state.FindInt("generation").value_or(0) != generation ||
+      !state.FindBool("pending").value_or(false)) {
+    std::move(done).Run("Setup transaction was superseded.");
+    return;
+  }
   state.Set("pending", false);
   state.Set("completed", true);
+  state.Set("editing", false);
   state.Set("step", kLastSetupStep);
   prefs->SetDict(kSetupPref, std::move(state));
   prefs->SetBoolean(prefs::kHeliumDidOnboarding, true);
-  prefs->CommitPendingWrite(std::move(done));
+  prefs->CommitPendingWrite(base::BindOnce(std::move(done), std::string()));
 }
 
-void ApplyJournal(base::WeakPtr<Profile> profile, base::OnceClosure done) {
+void ApplyJournal(base::WeakPtr<Profile> profile, int generation,
+                  ApplyCallback done) {
   if (!profile) {
     return;
   }
   auto* preferences = profile->GetPrefs();
   const auto& state = preferences->GetDict(kSetupPref);
+  if (state.FindInt("generation").value_or(0) != generation ||
+      !state.FindBool("pending").value_or(false)) {
+    std::move(done).Run("Setup transaction was superseded.");
+    return;
+  }
   const auto* value = state.FindDict("config");
   auto config = value ? ParseConfig(*value) : std::nullopt;
-  if (!CanUseState(state) || !config ||
-      !ValidateApplication(profile.get(), *config, true).empty()) {
+  if (!CanUseState(state) || !config) {
+    std::move(done).Run("Unsupported pending setup configuration.");
+    return;
+  }
+  auto error = ValidateApplication(profile.get(), *config, true);
+  if (!error.empty()) {
+    std::move(done).Run(error);
     return;  // Preserve the journal for inspection/retry; never partially apply.
   }
   const Config& c = *config;
@@ -76,7 +96,8 @@ void ApplyJournal(base::WeakPtr<Profile> profile, base::OnceClosure done) {
   local->SetInteger(tuning::kBatterySaverModeState, BatteryState(c));
   local->SetBoolean(tuning::kTabFreezingEnabled, c.background_suspension);
   // Flush global performance settings BEFORE clearing the profile journal.
-  local->CommitPendingWrite(base::BindOnce(&FinishJournal, profile, std::move(done)));
+  local->CommitPendingWrite(base::BindOnce(&FinishJournal, profile, generation,
+                                          std::move(done)));
 }
 }  // namespace
 
@@ -118,6 +139,32 @@ base::DictValue GetSetupState(Profile* profile) {
   }
   // v0 is the empty, pre-Aether state. Its migration is additive and local.
   result.Set("version", kSchemaVersion);
+  if (state.FindBool("completed").value_or(false) &&
+      !state.FindBool("editing").value_or(false) &&
+      !state.FindBool("pending").value_or(false)) {
+    // Native Settings remain the source of truth when setup is reopened.
+    Config current;
+    auto* prefs = profile->GetPrefs();
+    const auto* committed = state.FindDict("config");
+    if (committed) {
+      current = ParseConfig(*committed).value_or(Config());
+    }
+    const int layout = prefs->GetInteger(prefs::kHeliumLayout);
+    current.layout = layout >= 0 && layout <= 2 ? layout : current.layout;
+    current.density = prefs->GetInteger(kDensityPref);
+    current.appearance = prefs->GetInteger(prefs::kBrowserColorScheme);
+    current.accent = prefs->GetBoolean(prefs::kGrayscaleThemeEnabled) ? 0 :
+                    prefs->GetInteger(prefs::kUserColor) & 0xffffff;
+    current.experience = prefs->GetBoolean(prefs::kShowHomeButton) ? 2 :
+                         prefs->GetBoolean(prefs::kShowAvatarButton) ? 1 : 0;
+    auto* local = g_browser_process->local_state();
+    current.memory_saver = local->GetInteger(tuning::kMemorySaverModeState) == 2;
+    current.battery_saver = local->GetInteger(tuning::kBatterySaverModeState) != 0;
+    current.background_suspension = local->GetBoolean(tuning::kTabFreezingEnabled);
+    current.performance = local->GetInteger(tuning::kBatterySaverModeState) == 2 ? 2 :
+                          local->GetInteger(tuning::kMemorySaverModeAggressiveness) == 2 ? 1 : 0;
+    result.Set("draft", ToValue(IsValid(current) ? current : Config()));
+  }
   if (!result.FindDict("draft")) {
     const auto* committed = result.FindDict("config");
     result.Set("draft", committed ? committed->Clone() : ToValue(Config()));
@@ -173,26 +220,33 @@ void SaveDraft(Profile* profile, const Config& config, int step) {
   auto state = GetSetupState(profile);
   state.Set("draft", ToValue(config));
   state.Set("step", step);
+  state.Set("editing", true);
   profile->GetPrefs()->SetDict(kSetupPref, std::move(state));
 }
 
 void CommitConfiguration(Profile* profile, const Config& config,
-                         base::OnceClosure done) {
+                         ApplyCallback done) {
   CHECK(ValidateApplication(profile, config).empty());
   auto state = GetSetupState(profile);
   state.Set("config", ToValue(config));
   state.Set("draft", ToValue(config));
   state.Set("pending", true);
+  const int previous = state.FindInt("generation").value_or(0);
+  const int generation = previous >= std::numeric_limits<int>::max() ? 1 : previous + 1;
+  state.Set("generation", generation);
   profile->GetPrefs()->SetDict(kSetupPref, std::move(state));
   // Persist intent before touching any live preference.
   profile->GetPrefs()->CommitPendingWrite(
-      base::BindOnce(&ApplyJournal, profile->GetWeakPtr(), std::move(done)));
+      base::BindOnce(&ApplyJournal, profile->GetWeakPtr(), generation,
+                     std::move(done)));
 }
 
 void RecoverPendingConfiguration(Profile* profile) {
   if (!profile->IsOffTheRecord() &&
       profile->GetPrefs()->GetDict(kSetupPref).FindBool("pending").value_or(false)) {
-    ApplyJournal(profile->GetWeakPtr(), base::OnceClosure());
+    ApplyJournal(profile->GetWeakPtr(), profile->GetPrefs()->GetDict(kSetupPref)
+                                          .FindInt("generation").value_or(0),
+                 base::BindOnce([](std::string) {}));
   }
 }
 }  // namespace aether

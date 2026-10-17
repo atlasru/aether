@@ -26,10 +26,23 @@ strings include remains because other upstream string targets reference it.
    apply every relevant hunk from the FULL pinned common/platform series with
    zero fuzz; check/apply Aether patches. This is not full-tree preparation, GN,
    linking or runtime validation. Reports include baseline SHA-256 hashes.
+   `scripts/verify_resources.py --download-grit` separately fetches Chromium's
+   pinned GRIT Python dependency manifest/modules and builds a real `.pak` and
+   resource map. It checks five URL paths, catching unusable WebUI mappings.
 3. Full self-hosted build: prepare Chromium, overlay Aether, GN dependency checks,
    compile browser/driver/installer, then run browser smoke tests.
 4. GUI/manual validation: native layouts at narrow widths, keyboard, screen
    reader, DPI, touch, sessions, crash recovery, extensions, downloads and installer.
+
+The pinned Chromium tag resolves to commit
+`5869fe313571d75152b77813cf0a4ee26a4e6df0`; sparse source/tool retrieval uses this
+full SHA rather than a moving version tag. Full preparation retains upstream's
+archive hashes and dependency configuration at the platform/common pins.
+
+The manual build workflow exists on the default branch so it can be dispatched
+without merging uncompiled browser code into `main`. It resolves `source_ref`
+once in validation, then checks out that exact SHA for build, packaging and draft
+release. Ordinary PRs never execute on the self-hosted build runner.
 
 ## Incremental source preparation
 

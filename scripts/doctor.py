@@ -13,15 +13,28 @@ from pathlib import Path
 from common import ROOT
 
 
-def inspect(target: str, directory: Path) -> dict:
+def inspect(target: str, directory: Path, minimum_disk_gib=120) -> dict:
+    while not directory.exists() and directory.parent != directory:
+        directory = directory.parent
     disk = shutil.disk_usage(directory)
     memory = None
     if hasattr(os, "sysconf"):
         memory = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+    elif platform.system() == "Windows":
+        import ctypes
+        class MemoryStatus(ctypes.Structure):
+            _fields_ = [("length", ctypes.c_ulong), ("load", ctypes.c_ulong)] + [
+                (name, ctypes.c_ulonglong) for name in
+                ("physical", "available", "page_total", "page_available",
+                 "virtual_total", "virtual_available", "extended")]
+        status = MemoryStatus()
+        status.length = ctypes.sizeof(status)
+        if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+            memory = status.physical
     blockers = []
     # Conservative project guardrails, not Chromium's universal minimums.
-    if disk.free < 120 * 1024**3:
-        blockers.append("At least 120 GiB free disk required by Aether build preflight")
+    if disk.free < minimum_disk_gib * 1024**3:
+        blockers.append(f"At least {minimum_disk_gib} GiB free disk required by Aether build preflight")
     if memory is not None and memory < 16 * 1024**3:
         blockers.append("At least 16 GiB RAM required by Aether build preflight")
     if target == "windows" and platform.system() != "Windows":

@@ -18,6 +18,7 @@ Python 3.11+, Git, Node.js 22+ and a C++20 compiler:
 
 ```sh
 python3 scripts/check.py
+python3 scripts/verify_resources.py --download-grit
 python3 scripts/bootstrap.py windows
 python3 scripts/verify_patches.py windows --upstream .work/windows --destination .work/verify-win
 python3 scripts/verify_patches.py linux --destination .work/verify-linux
@@ -36,7 +37,10 @@ paths. Reserve at least 120 GiB free disk and 16 GiB RAM for the project preflig
 
 ```powershell
 python scripts/doctor.py --target windows --require-build
+python -m pip install -r requirements-build.txt
 python scripts/build.py windows --work-dir D:\aether-build -j 12
+python scripts/smoke.py --source D:\aether-build\windows\build\src --output dist\smoke.json
+python scripts/package.py --upstream D:\aether-build\windows --smoke-report dist\smoke.json
 ```
 
 The real browser output is `D:\aether-build\windows\build\src\out\Default\chrome.exe`.
@@ -51,7 +55,7 @@ No Chromium source, dependency downloads or binaries are checked into this repo.
 
 ## Linux build
 
-Use the dependencies in the pinned `helium-linux/docker/Dockerfile` on a dedicated
+Use the dependencies in the pinned `helium-linux/docker/build.Dockerfile` on a dedicated
 Debian-based x64 host, as a regular user with a functioning Chromium sandbox.
 
 ```sh
@@ -61,3 +65,19 @@ python3 scripts/build.py linux --work-dir /opt/aether-build -j 12
 
 Linux compilation and packaging are not validated yet. See [DEVELOPMENT.md](DEVELOPMENT.md),
 [ROADMAP.md](ROADMAP.md), [PERFORMANCE.md](PERFORMANCE.md) and [LICENSES.md](LICENSES.md).
+
+## CI
+
+[Source checks](https://github.com/atlasru/aether/actions/workflows/validate.yml)
+run on pushes/PRs: portable tests, actual GRIT resource compilation and exact
+Windows/Linux sparse patch checks. Full browser builds use the manual
+`Build browser (self-hosted)` workflow, with `source_ref=dev` by default. Runners
+need `self-hosted`, `aether-build`, OS and x64 labels, prerequisites and an
+`AETHER_WORK_DIR` outside the Actions checkout. Its build cache persists there.
+
+Windows packaging requires real passing browser smoke and matching source/binary
+hashes. The optional release action creates only a **draft prerelease**; GUI,
+installer, signing and distribution-license review remain open. Linux currently
+uploads smoke evidence; Linux packaging/launcher integration is deferred.
+
+Verified scope and exact limitations: [VALIDATION.md](VALIDATION.md).

@@ -13,3 +13,17 @@
  }
  
  bool ShouldAccessComponentUpdateService(const PrefService& prefs) {
+--- a/chrome/browser/resources/settings/privacy_page/services_page.html
++++ b/chrome/browser/resources/settings/privacy_page/services_page.html
+@@ -99,11 +99,6 @@
+                     sub-label="$i18n{heliumSpellcheckToggleDescription}">
+                 </settings-toggle-button>
+             </if>
+-            <settings-toggle-button id="updatesToggleButton"
+-                pref="{{prefs.helium.services.browser_updates}}"
+-                label="$i18n{heliumUpdatesToggle}"
+-                sub-label="$i18n{heliumUpdatesToggleDescription}">
+-            </settings-toggle-button>
+             <settings-toggle-button id="filterlistToggleButton"
+                 pref="{{prefs.helium.services.ublock_assets}}"
+                 label="$i18n{heliumUboToggle}"

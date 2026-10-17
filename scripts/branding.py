@@ -69,6 +69,7 @@ def rebrand_strings(source: Path, platform_root: Path, write):
     sys.path.insert(0, str(platform_root / "helium-chromium/utils"))
     import name_substitution as names
     import name_substitution_utils as util
+    names.IGNORE_DIRS = [*names.IGNORE_DIRS, ".aether-backup", ".git"]
     util.add_grit_to_path(source)
     util.REPLACEMENT_REGEXES = [(re.compile(r"\bHelium\b"), "Aether"),
                                (re.compile(r"\bhelium://"), "aether://")]

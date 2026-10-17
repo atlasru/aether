@@ -12,6 +12,7 @@
 
 class Profile;
 namespace aether {
+using ApplyCallback = base::OnceCallback<void(std::string)>;
 std::optional<Config> ParseConfig(const base::DictValue& value);
 base::DictValue ToValue(const Config& config);
 base::DictValue GetSetupState(Profile* profile);
@@ -21,7 +22,7 @@ std::string ValidateApplication(Profile* profile, const Config& config,
                                 bool allow_pending = false);
 void SaveDraft(Profile* profile, const Config& config, int step);
 void CommitConfiguration(Profile* profile, const Config& config,
-                         base::OnceClosure done);
+                         ApplyCallback done);
 void RecoverPendingConfiguration(Profile* profile);
 }  // namespace aether
 #endif  // CHROME_BROWSER_AETHER_PREFERENCES_H_

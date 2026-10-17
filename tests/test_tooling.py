@@ -54,6 +54,8 @@ class ToolingTest(unittest.TestCase):
             module.generate(output)
             tree = ET.parse(output)
             includes = tree.findall(".//include")
+            outputs = tree.findall("./outputs/output")
+            self.assertTrue(any(entry.get("type") == "resource_file_map_source" for entry in outputs))
             self.assertEqual(len(includes), 5)
             self.assertEqual(includes[0].get("name"), "IDR_HELIUM_ONBOARDING_INDEX_HTML")
             for entry in includes:

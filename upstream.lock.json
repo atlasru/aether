@@ -1,6 +1,7 @@
 {
   "schema": 1,
   "chromium": "155.0.8059.84",
+  "chromium_revision": "5869fe313571d75152b77813cf0a4ee26a4e6df0",
   "helium_version": "0.19.4.1",
   "inspected_at": "2026-10-17",
   "repositories": {

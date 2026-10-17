@@ -10,7 +10,7 @@ def generate(output: Path):
                               "base_dir": str(Path(__file__).resolve().parent)})
     outputs = ET.SubElement(root, "outputs")
     for name, kind in [("grit/helium_onboarding_generated.h", "rc_header"),
-                       ("grit/helium_onboarding_generated_map.cc", "resource_map_source"),
+                       ("grit/helium_onboarding_generated_map.cc", "resource_file_map_source"),
                        ("grit/helium_onboarding_generated_map.h", "resource_map_header"),
                        ("helium_onboarding_generated.pak", "data_package")]:
         ET.SubElement(outputs, "output", {"filename": name, "type": kind})

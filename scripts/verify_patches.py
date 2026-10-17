@@ -18,7 +18,7 @@ import urllib.error
 import urllib.request
 
 from bootstrap import bootstrap
-from common import ROOT, git_apply, lock, run, series
+from common import ROOT, fingerprint, git_apply, lock, run, series
 
 
 def blocks(text: str):
@@ -47,8 +47,8 @@ def prepare(platform: str, platform_root: Path, destination: Path, paths=None):
     def download(name):
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        url = f"https://raw.githubusercontent.com/chromium/chromium/{lock()['chromium']}/{name}"
-        cache = ROOT / ".cache/chromium" / lock()["chromium"] / name
+        url = f"https://raw.githubusercontent.com/chromium/chromium/{lock()['chromium_revision']}/{name}"
+        cache = ROOT / ".cache/chromium" / lock()["chromium_revision"] / name
         if not cache.exists():
             with urllib.request.urlopen(url, timeout=60) as response:
                 data = response.read()
@@ -81,6 +81,8 @@ def verify(platform, platform_root, destination):
     report = {"scope": "Sparse patch application only; no GN, C++ browser compilation or runtime validation",
               "platform": platform, "upstream": lock(), "baseline_sha256": baseline,
               "patches": [str(p.relative_to(ROOT)) for p in own], "result": "passed"}
+    report["source_fingerprint"] = fingerprint()
+    report["patch_sha256"] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in own}
     (destination / "verification.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
     return report
