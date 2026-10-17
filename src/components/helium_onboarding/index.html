@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Set up Aether</title>
+  <link rel="icon" href="aether.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="setup.css">
+  <script type="module" src="setup.js"></script>
+</head>
+<body>
+  <div class="shell" aria-busy="true" id="shell">
+    <header><a class="brand" href="chrome://newtab/" aria-label="Aether new tab"><img src="aether.svg" alt="" width="26" height="26">Aether</a><span id="progress" aria-live="polite">Getting ready</span></header>
+    <main id="main">
+      <section data-step="0" aria-labelledby="title-0">
+        <div class="welcome-mark" aria-hidden="true"><img src="aether.svg" alt="" width="100" height="100"></div>
+        <p class="eyebrow">A little space for you</p>
+        <h1 id="title-0" tabindex="-1">A browser that<br>feels like yours.</h1>
+        <p class="intro">Fast. Thoughtful. Personal.</p>
+        <p class="detail">A few choices. No account. Change anything later.</p>
+      </section>
+      <section data-step="1" aria-labelledby="title-1" hidden>
+        <p class="eyebrow">Your space</p><h1 id="title-1" tabindex="-1">How do you like to browse?</h1>
+        <p class="intro">Same tabs. A different perspective.</p>
+        <fieldset class="cards"><legend class="sr-only">Browser layout</legend>
+          <label class="card"><input type="radio" name="layout" value="1" checked><span class="mini-browser compact" aria-hidden="true"><span class="mini-top"><i></i><b></b><em></em><em></em></span><span class="mini-content"></span></span><strong>Compact</strong><span>One calm row. More room for the web.</span></label>
+          <label class="card"><input type="radio" name="layout" value="0"><span class="mini-browser classic" aria-hidden="true"><span class="mini-tabs"><em></em><em></em><em></em></span><span class="mini-top"><i></i><b></b></span><span class="mini-content"></span></span><strong>Classic</strong><span>Familiar tabs and a separate address bar.</span></label>
+          <label class="card"><input type="radio" name="layout" value="2"><span class="mini-browser vertical" aria-hidden="true"><span class="mini-top"><i></i><b></b></span><span class="mini-side"><em></em><em></em><em></em></span><span class="mini-content"></span></span><strong>Vertical</strong><span>Tabs at your side. Collapse when needed.</span></label>
+        </fieldset>
+      </section>
+      <section data-step="2" aria-labelledby="title-2" hidden>
+        <p class="eyebrow">Your rhythm</p><h1 id="title-2" tabindex="-1">What matters most to you?</h1>
+        <p class="intro">Choose how much of the toolbar you see.</p>
+        <fieldset class="cards text-cards"><legend class="sr-only">Interface preset</legend>
+          <label class="card"><input type="radio" name="experience" value="0"><span class="choice-icon" aria-hidden="true">○</span><strong>Simplicity</strong><span>A quiet toolbar. Profile and home buttons tucked away.</span></label>
+          <label class="card"><input type="radio" name="experience" value="1" checked><span class="choice-icon" aria-hidden="true">◒</span><strong>Balanced <small>Default</small></strong><span>Profile access at hand. Essential controls always there.</span></label>
+          <label class="card"><input type="radio" name="experience" value="2"><span class="choice-icon" aria-hidden="true">◉</span><strong>Control</strong><span>Home and profile buttons visible. Native settings a click away.</span></label>
+        </fieldset><p class="detail">Every preset keeps the same privacy and security protections.</p>
+      </section>
+      <section data-step="3" aria-labelledby="title-3" hidden>
+        <p class="eyebrow">Your atmosphere</p><h1 id="title-3" tabindex="-1">Make it feel right.</h1>
+        <div class="appearance-grid">
+          <div class="appearance-controls">
+            <fieldset class="segments"><legend>Appearance</legend><label><input type="radio" name="appearance" value="0" checked><span>System</span></label><label><input type="radio" name="appearance" value="1"><span>Light</span></label><label><input type="radio" name="appearance" value="2"><span>Dark</span></label></fieldset>
+            <fieldset class="swatches"><legend>Accent color</legend><label><input type="radio" name="accent" value="0" checked><span class="swatch neutral" title="Neutral"><span class="sr-only">Neutral</span></span></label><label><input type="radio" name="accent" value="7164885"><span class="swatch iris"><span class="sr-only">Iris</span></span></label><label><input type="radio" name="accent" value="2123391"><span class="swatch ocean"><span class="sr-only">Ocean</span></span></label><label><input type="radio" name="accent" value="3576921"><span class="swatch forest"><span class="sr-only">Forest</span></span></label><label class="custom-color">Custom<input id="custom-accent" type="color" value="#6d53d5" aria-label="Custom accent color"></label></fieldset>
+            <fieldset class="segments"><legend>Interface density</legend><label><input type="radio" name="density" value="0" checked><span>Comfortable</span></label><label><input type="radio" name="density" value="1"><span>Compact</span></label></fieldset>
+          </div>
+          <div id="live-preview" class="live-preview" data-layout="1" data-density="0" aria-label="Appearance preview">
+            <div class="preview-tabs"><span>Today</span><span>New ideas</span><span>+</span></div><div class="preview-toolbar"><span>‹ &nbsp; › &nbsp; ↻</span><span class="preview-address">Search or enter an address</span><span>⋯</span></div><div class="preview-page"><img src="aether.svg" alt="" width="35" height="35"><p>A little more room.</p><span>For everything that matters.</span></div>
+          </div>
+        </div>
+      </section>
+      <section data-step="4" aria-labelledby="title-4" hidden>
+        <p class="eyebrow">Behind the scenes</p><h1 id="title-4" tabindex="-1">Fast by nature.<br>Private by default.</h1>
+        <p class="intro">Chromium's resource controls. Helium's built-in content blocking.</p>
+        <div class="settings-list">
+          <div class="setting"><div><strong>Tracker and ad blocking</strong><p>Built-in uBlock Origin is preserved. Configure filters in extension settings.</p></div><a href="chrome://extensions/" class="text-link">Manage</a></div>
+          <label class="setting"><span><strong>Memory Saver</strong><span>Reclaims memory from eligible inactive tabs. Returning may reload a page.</span></span><input type="checkbox" name="memorySaver" checked></label>
+          <label class="setting"><span><strong>Battery Saver</strong><span>Limits background work when battery is low.</span></span><input type="checkbox" name="batterySaver" checked></label>
+          <label class="setting"><span><strong>Background tab suspension</strong><span>Allows Chromium to freeze eligible background pages. Its activity exclusions remain in place.</span></span><input type="checkbox" name="backgroundSuspension" checked></label>
+        </div>
+        <fieldset class="segments profile"><legend>Resource profile</legend><label><input type="radio" name="performance" value="0" checked><span>Balanced</span></label><label><input type="radio" name="performance" value="1"><span>Memory Saver</span></label><label><input type="radio" name="performance" value="2"><span>Battery Saver</span></label></fieldset>
+        <p id="profile-detail" class="detail"></p><p class="detail">Performance options apply to all Aether profiles. Site exclusions remain in <a href="chrome://settings/performance">Performance settings</a>. No benchmark claims yet.</p>
+      </section>
+      <section data-step="5" aria-labelledby="title-5" hidden>
+        <p class="eyebrow">Ready when you are</p><h1 id="title-5" tabindex="-1">Everything is in place.</h1><p class="intro">A space that works your way.</p>
+        <dl id="summary" class="summary"></dl>
+        <p class="detail">Reopen this setup at <a href="chrome://setup/">aether://setup</a>.<br>Bookmarks, passwords, extensions and advanced controls stay in <a href="chrome://settings/">Settings</a>.</p>
+        <button id="change" class="text-button">Change settings</button>
+      </section>
+      <p id="error" role="alert" hidden></p>
+    </main>
+    <footer><button id="skip" class="text-button" disabled>Skip setup</button><div><button id="back" class="secondary" hidden disabled>Back</button><button id="next" class="primary" disabled>Get started</button></div></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.work/
+.cache/
+out/
+dist/
+__pycache__/
+*.py[cod]
+*.log
+node_modules/
+.DS_Store
+Thumbs.db

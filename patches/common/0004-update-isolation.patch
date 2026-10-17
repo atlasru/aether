@@ -1,0 +1,15 @@
+--- a/components/helium_services/helium_services_helpers.cc
++++ b/components/helium_services/helium_services_helpers.cc
+@@ -97,9 +97,9 @@
+             prefs.GetBoolean(prefs::kHeliumBangsEnabled);
+ }
+ 
+-bool ShouldAccessUpdateService(const PrefService& prefs) {
+-  return ShouldAccessServices(prefs) &&
+-         prefs.GetBoolean(prefs::kHeliumUpdateFetchingEnabled);
++bool ShouldAccessUpdateService(const PrefService&) {
++  // Aether has no signed update channel yet. Never request Helium packages.
++  return false;
+ }
+ 
+ bool ShouldAccessComponentUpdateService(const PrefService& prefs) {

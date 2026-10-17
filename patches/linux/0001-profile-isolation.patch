@@ -1,0 +1,20 @@
+--- a/chrome/common/chrome_paths_linux.cc
++++ b/chrome/common/chrome_paths_linux.cc
+@@ -81,7 +81,7 @@
+   std::unique_ptr<base::Environment> env(base::Environment::Create());
+   base::FilePath config_dir;
+   std::optional<std::string> chrome_config_home_str =
+-      env->GetVar("HELIUM_CONFIG_HOME");
++      env->GetVar("AETHER_CONFIG_HOME");
+   if (chrome_config_home_str.has_value() &&
+       base::IsStringUTF8(chrome_config_home_str.value())) {
+     config_dir = base::FilePath::FromUTF8Unsafe(chrome_config_home_str.value());
+@@ -90,7 +90,7 @@
+         GetXDGDirectory(env.get(), kXdgConfigHomeEnvVar, kDotConfigDir);
+   }
+ 
+-  std::string data_dir_basename = "net.imput.helium";
++  std::string data_dir_basename = "io.github.atlasru.aether";
+   *result = config_dir.Append(data_dir_basename + GetChannelSuffixForDataDir());
+   return true;
+ }

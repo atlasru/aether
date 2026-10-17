@@ -1,0 +1,43 @@
+--- a/chrome/browser/ui/views/toolbar/toolbar_view.h
++++ b/chrome/browser/ui/views/toolbar/toolbar_view.h
+@@ -526,6 +526,7 @@
+ 
+   std::unique_ptr<ExtensionsToolbarCoordinator> extensions_toolbar_coordinator_;
+ 
++  IntegerPrefMember aether_density_;
+   BooleanPrefMember show_forward_button_;
+ 
+   // Controls whether or not a home button should be shown on the toolbar.
+--- a/chrome/browser/ui/views/toolbar/toolbar_view.cc
++++ b/chrome/browser/ui/views/toolbar/toolbar_view.cc
+@@ -386,6 +386,11 @@
+                                       *this);
+   }
+ 
++  aether_density_.Init(
++      "aether.ui.density", browser_->GetProfile()->GetPrefs(),
++      base::BindRepeating(&ToolbarView::UpdateToolbarLayout,
++                          base::Unretained(this)));
++
+   SetID(VIEW_ID_TOOLBAR);
+   SetProperty(views::kElementIdentifierKey, kToolbarElementId);
+ 
+@@ -2211,6 +2216,10 @@
+ }
+ 
+ void ToolbarView::UpdateToolbarLayout() {
++  if (layout_manager_ && !ui::TouchUiController::Get()->touch_ui()) {
++    const int vertical_padding = aether_density_.GetValue() == 1 ? 5 : 6;
++    layout_manager_->SetInteriorMargin(gfx::Insets::VH(vertical_padding, 6));
++  }
+   if (!location_bar_) {
+     return;
+   }
+@@ -2259,6 +2268,7 @@
+   }
+ 
+   InvalidateLayout();
++  PreferredSizeChanged();
+ }
+ 
+ void ToolbarView::AbortToolbarContainerAnimationsForZenReveal() {

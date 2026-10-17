@@ -1,0 +1,17 @@
+# Copyright 2026 The Aether Authors
+# SPDX-License-Identifier: GPL-3.0-only
+source_set("aether") {
+  sources = [ "preferences.cc" ]
+  public = [ "config.h", "preferences.h" ]
+  public_deps = [ "//base" ]
+  deps = [
+    "//chrome/browser:browser_process",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/themes",
+    "//chrome/common",
+    "//components/helium_services",
+    "//components/performance_manager",
+    "//components/prefs",
+    "//skia",
+  ]
+}

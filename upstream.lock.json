@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "chromium": "155.0.8059.84",
+  "helium_version": "0.19.4.1",
+  "inspected_at": "2026-10-17",
+  "repositories": {
+    "helium": {"url": "https://github.com/imputnet/helium.git", "revision": "832faa7822566270e10c0d3262f702f9d0fea81f"},
+    "windows": {"url": "https://github.com/imputnet/helium-windows.git", "revision": "11a292ea63c107e8ed7f5edb5883df10f977b845"},
+    "linux": {"url": "https://github.com/imputnet/helium-linux.git", "revision": "cf878d4aaff58d063beada276c437ae756a142aa"}
+  }
+}

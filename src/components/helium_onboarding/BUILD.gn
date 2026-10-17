@@ -1,0 +1,24 @@
+# Copyright 2026 The Aether Authors
+# SPDX-License-Identifier: GPL-3.0-only
+import("//tools/grit/grit_rule.gni")
+
+# Reuse Helium's resource ID allocation and chrome_paks wiring. No npm/Vite.
+action("grit") {
+  script = "generate_grd.py"
+  inputs = [ "index.html", "setup.css", "setup.js", "state.mjs", "aether.svg" ]
+  outputs = [ "$target_gen_dir/resources.grd" ]
+  args = [ rebase_path(outputs[0], root_build_dir) ]
+}
+
+grit("generated_resources") {
+  source = "$target_gen_dir/resources.grd"
+  enable_input_discovery_for_gn_analyze = false
+  output_dir = "$target_gen_dir/resources"
+  outputs = [
+    "grit/helium_onboarding_generated.h",
+    "grit/helium_onboarding_generated_map.cc",
+    "grit/helium_onboarding_generated_map.h",
+    "helium_onboarding_generated.pak",
+  ]
+  deps = [ ":grit" ]
+}
