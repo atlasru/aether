@@ -5,7 +5,7 @@ The browser acceptance criteria are not met.**
 
 | Check | Observed result | Scope |
 |---|---|---|
-| Python tooling tests | 4 passed | Pins, patch scope, nested-tarball patching, resource manifest |
+| Python tooling tests | 5 passed | Pins, patch scope, nested-tarball patching, resource manifest, actual spawn-import regression |
 | Node setup-state tests | 10 passed | Defaults, recovery/back, schema downgrade, malformed values, preset independence, interrupted reconfiguration |
 | Native portable policy | Compiled with g++ C++20, warnings as errors; executed successfully | 1,296 supported combinations plus invalid range/schema rejection; not Chromium C++ integration |
 | Windows patches | Passed | 17 touched files reconstructed from pinned Chromium and every relevant common/Windows hunk; zero fuzz |
@@ -15,8 +15,10 @@ The browser acceptance criteria are not met.**
 | Source overlay lifecycle | Passed | Actual sparse patch/overlay application, independent version injection, refresh, idempotence and external-edit rejection; icons/string bulk stage tested separately |
 | Branding raster generation | Passed | Seven local PNG sizes: 16/24/32/48/64/128/256 px, transparent corners |
 | Hosted GitHub Actions | Passed, 3/3 jobs | Tooling/configuration + real GRIT, exact Windows patches, exact Linux patches |
-| Windows build preflight | Failed as expected | Linux host; about 30 GiB free disk and 9.7 GiB RAM; no Windows/VS/SDK |
-| Chromium GN/link/browser smoke | Not run | No complete source/build environment |
+| Local Windows build preflight | Failed as expected | Linux host; about 30 GiB free disk and 9.7 GiB RAM; no Windows/VS/SDK |
+| Full hosted Windows/Linux build attempts | In progress | Actual source preparation/GN/compilation driver, not sparse validation |
+| Windows SDK installation | Passed on actual runner | Pinned SHA-256, Microsoft Authenticode, exit 0, required SDK files, Debugging Tools 10.0.28000.2526 |
+| Chromium GN/link/browser smoke | Result pending | No executable or browser smoke pass confirmed |
 | Browser/installer/GUI/security validation | Not run | Native layout, downloads, extension compatibility, sandbox runtime, OS registration, DPI, accessibility and crash injection remain open |
 | Performance benchmarks | Not run | No browser comparison or performance claim |
 
@@ -36,6 +38,13 @@ Exact per-file baseline/patch hashes and resource compilation evidence are in
 `docs/validation/2026-10-17/`. CI uploads fresh reports for the checked commit.
 Observed GitHub run: [Validate source #1](https://github.com/atlasru/aether/actions/runs/39040530229),
 commit `63906e7e9b62b8713491fd87d97f323754304bed`, completed successfully.
-All three jobs and their resource/artifact upload steps were inspected. This run
-does not include the manual self-hosted browser build workflow. That build has
-not been run and no working executable is claimed.
+All three jobs and their resource/artifact upload steps were inspected. These
+source checks are separate from the real browser build attempts now launched:
+[attempt 1 Windows/Linux](https://github.com/atlasru/aether/actions/runs/39041366048),
+[attempt 2 Windows](https://github.com/atlasru/aether/actions/runs/39043691087),
+and [attempt 3 Windows](https://github.com/atlasru/aether/actions/runs/39044290753).
+Windows attempt 1 failed in Python spawn imports before GN; fixed in the driver.
+Attempt 2 was cancelled after its early SDK diagnostic showed 26100 instead of
+Chromium's pinned 28000. Attempt 3 successfully installed the required SDK and
+continues. Linux attempt 1 continues. [HOSTED_BUILDS.md](HOSTED_BUILDS.md) records
+measurements and durable evidence. No working executable is claimed yet.

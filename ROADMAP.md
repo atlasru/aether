@@ -5,7 +5,7 @@ Status on 2026-10-17. **Not alpha-ready. No compiled Aether browser.**
 | Area | Current state |
 |---|---|
 | Repository investigation | Completed for locked common/Windows/Linux sources |
-| Base/build reproducibility | Pinned bootstrap and real upstream build driver implemented; full build untested |
+| Base/build reproducibility | Pinned bootstrap and real upstream build driver implemented; actual hosted Windows/Linux build attempts underway; executable not yet verified |
 | Identity/profiles | Source patches for Windows and Linux; runtime coexistence untested |
 | Original branding | SVG/native vector/raster build generation; OS appearance untested |
 | Compact/Classic/Vertical | Existing Helium native implementations reused; Compact default patched; Aether runtime untested |
@@ -22,9 +22,9 @@ Status on 2026-10-17. **Not alpha-ready. No compiled Aether browser.**
 | Auto-updates/signing | Not implemented; Helium update fetch explicitly blocked |
 | Windows executable/installer | Not produced |
 | Linux executable/package | Not produced |
-| CI | Hosted source/resource/patch run passed all 3 jobs at `63906e7e9b62b8713491fd87d97f323754304bed`; manual self-hosted full build has not run |
+| CI | Hosted Windows/Linux full build driver running; Windows spawn defect fixed; SDK 28000 install verified on Windows; native browser result pending. Source checks remain separate. |
 
-Local checks passed: 4 Python tooling tests, 10 Node setup-state tests, compiled
+Local checks passed: 5 Python tooling tests, 10 Node setup-state tests, compiled
 C++20 policy checks covering 1,296 supported configurations, Windows/Linux exact
 patch application, actual GRIT `.pak`/URL-map compilation, and source-overlay
 refresh/idempotence/manual-edit protection. These are not browser runtime tests.
@@ -43,6 +43,11 @@ installer/COM/service coexistence with installed Helium and Chromium. Review
 inherited download-reputation policy and every redistributed asset license.
 Only then produce and test an explicitly labeled alpha package.
 
-Full Chromium build is blocked in the current Linux workspace by approximately
-30 GiB available storage, 9.7 GiB RAM and absent Windows/VS/SDK tooling. Source
-and lightweight integration work continue independently of that blocker.
+Actual builds run on standard GitHub-hosted runners. Windows attempt 1 failed in
+upstream name-substitution worker imports before GN; the driver is fixed and a
+spawn regression passes. Measured D: free space is 236 GB, so no Windows disk
+exhaustion is claimed. Attempt 2 was superseded after observing only SDK 26100.
+Attempt 3 installs hash/signature-verified SDK 28000 successfully and continues
+full preparation/GN/compilation. Linux attempt 1 also continues. No hosted hard
+resource failure, compiled executable or runtime smoke success is yet confirmed.
+See [HOSTED_BUILDS.md](HOSTED_BUILDS.md) for measurements, run links and exact scope.

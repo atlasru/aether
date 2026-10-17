@@ -103,6 +103,15 @@ The next requested Windows build supersedes the incompatible in-progress job.
 Attempt 3 installs Microsoft SDK servicing release 10.0.28000.2526 (above the
 2270 minimum), with vendor URL and SHA-256 pinned from Microsoft's winget
 manifest, plus Authenticode verification. Installation logs, exit status and
-required header/library/tool checks are retained. This change has not yet been
-verified on the runner. New build requests supersede older builds per platform;
+required header/library/tool checks are retained. On run 39044290753 the installer
+returned 0, the expected SHA-256 matched, Authenticode status was Valid with
+Microsoft Corporation as signer, required files existed and dbghelp.dll reported
+10.0.28000.2526. The SDK fix is verified on the actual runner; browser compilation
+and runtime verification remain separate. New build requests supersede older builds per platform;
 they do not cancel the other platform's independent attempt.
+
+SDK installation evidence: [docs/builds/attempt-3-windows/](docs/builds/attempt-3-windows/).
+Run 39044290753 (source `194b0c841026298f6eb81c47a32b765abfbb28bb`) continues
+the full browser build after this successful installation. Its initial artifact
+contains SDK installer logs; the final build-evidence artifact will contain the
+actual compilation result. First Linux attempt 39041366048 remains independent.

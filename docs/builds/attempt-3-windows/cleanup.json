@@ -1,0 +1,188 @@
+[
+  {
+    "path": "C:\\Android",
+    "free_before": 33447882752,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\Android"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\ghcup",
+    "free_before": 33447882752,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\ghcup"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\Program Files\\dotnet",
+    "free_before": 38035902464,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\Program Files\\dotnet"
+      ],
+      "error": "Command '['cmd', '/c', 'rmdir', '/s', '/q', 'C:\\\\Program Files\\\\dotnet']' timed out after 90 seconds"
+    }
+  },
+  {
+    "path": "C:\\Program Files\\Android",
+    "free_before": 42130640896,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\Program Files\\Android"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\Miniconda",
+    "free_before": 42473922560,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\Miniconda"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\Program Files\\PostgreSQL",
+    "free_before": 43202392064,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\Program Files\\PostgreSQL"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\Program Files\\Microsoft SDKs\\Azure",
+    "free_before": 44310441984,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\Program Files\\Microsoft SDKs\\Azure"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\hostedtoolcache\\windows\\Go",
+    "free_before": 44617031680,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\hostedtoolcache\\windows\\Go"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\hostedtoolcache\\windows\\Java_Temurin-Hotspot_jdk",
+    "free_before": 45392551936,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\hostedtoolcache\\windows\\Java_Temurin-Hotspot_jdk"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\hostedtoolcache\\windows\\Ruby",
+    "free_before": 46880870400,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\hostedtoolcache\\windows\\Ruby"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  {
+    "path": "C:\\hostedtoolcache\\windows\\CodeQL",
+    "free_before": 47174750208,
+    "free_after": 157843734528,
+    "result": {
+      "command": [
+        "cmd",
+        "/c",
+        "rmdir",
+        "/s",
+        "/q",
+        "C:\\hostedtoolcache\\windows\\CodeQL"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  }
+]

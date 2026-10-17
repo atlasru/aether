@@ -1,0 +1,33 @@
+{
+  "host": "Windows-2025Server-10.0.26100-SP0",
+  "target": "windows",
+  "free_disk_bytes": 157843726336,
+  "physical_memory_bytes": 17174360064,
+  "tools": {
+    "git": "C:\\Program Files\\Git\\ucrt64\\bin\\git.EXE",
+    "python3": "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python3.EXE",
+    "patch": "C:\\Program Files\\Git\\usr\\bin\\patch.EXE",
+    "clang++": "C:\\Program Files\\LLVM\\bin\\clang++.EXE",
+    "g++": "C:\\mingw64\\bin\\g++.EXE",
+    "ninja": "C:\\ProgramData\\Chocolatey\\bin\\ninja.EXE",
+    "docker": "C:\\Windows\\system32\\docker.EXE"
+  },
+  "blockers": [
+    "At least 16 GiB RAM required by Aether build preflight"
+  ],
+  "ready": false,
+  "time": "2026-10-17T15:22:26.839790+00:00",
+  "cpu_count": 4,
+  "runner_image": "20261007.264.1",
+  "runner_os": "Windows",
+  "system": {
+    "command": [
+      "powershell",
+      "-NoProfile",
+      "-Command",
+      "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; Get-Volume | Select-Object DriveLetter,FileSystem,Size,SizeRemaining | ConvertTo-Json"
+    ],
+    "exit_code": 0,
+    "output": "{\n    \"TotalVisibleMemorySize\":  16771836,\n    \"FreePhysicalMemory\":  14147164\n}\n[\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"FAT32\",\n        \"Size\":  99614720,\n        \"SizeRemaining\":  63649280\n    },\n    {\n        \"DriveLetter\":  \"D\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  161059172352,\n        \"SizeRemaining\":  157843726336\n    },\n    {\n        \"DriveLetter\":  \"C\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  160467759104,\n        \"SizeRemaining\":  48518754304\n    },\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  471855104,\n        \"SizeRemaining\":  454893568\n    }\n]\n"
+  }
+}
