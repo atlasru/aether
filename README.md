@@ -3,8 +3,8 @@
 A desktop browser fork built directly on Helium / Chromium. Windows x64 first;
 Linux x64 secondary. Native Chromium Views remain the browser chrome.
 
-**Development source, not a usable alpha yet. No Aether browser executable has
-been compiled or launched.** Do not use this branch for daily browsing.
+**Development source, not a usable alpha yet. No working Aether executable has
+been verified.** Do not use this branch for daily browsing.
 
 Implemented source includes an independent application/profile identity,
 Compact as the default native layout, the inherited Classic and Vertical layouts,
@@ -74,7 +74,8 @@ run on pushes/PRs: portable tests, actual GRIT resource compilation and exact
 Windows/Linux sparse patch checks. [Compile Aether browser](https://github.com/atlasru/aether/actions/workflows/build.yml)
 uses GitHub-hosted `windows-2025-vs2026` and `ubuntu-24.04` runners. A push changing
 `ci/build-request.json` on `dev` starts its selected Windows/Linux platforms. Manual dispatch can select a
-platform and an existing larger-runner label. Full Chromium compilation runs,
+platform. The dev definition also has an existing larger-runner label input;
+API dispatch input registration must be synchronized before relying on extra fields. Full Chromium compilation runs,
 regardless of the advisory preflight's disk/RAM warnings (`--attempt`).
 
 The hosted configuration uses release component builds, zero debug symbols,
@@ -82,7 +83,14 @@ no PGO/ThinLTO and four concurrent compiler jobs. It omits installer targets and
 preserves browser features and the sandbox. Before/after runner measurements,
 periodic resource samples, build logs and GN arguments upload even on failure.
 Successful compilation archives the executable with component runtime files,
-then runs real browser smoke tests. Runtime artifacts alone do not imply that
+then runs real browser smoke tests from the extracted archive. Runtime artifacts alone do not imply that
 smoke tests passed. No stable release is automatically published.
 
 Verified scope and exact limitations: [VALIDATION.md](VALIDATION.md).
+
+Full native attempts have now demonstrated the configured 355-minute execution
+limit with spare disk/RAM: Windows 27,092/70,804 operations and Linux
+33,275/65,046. Cached retries are active. Successors are queued and a bounded
+controller can continue verified native checkpoints without treating partial
+compilation as success. End-to-end native cache continuation and the executable
+remain unverified. See [HOSTED_BUILDS.md](HOSTED_BUILDS.md) for exact evidence.

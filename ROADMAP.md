@@ -1,88 +1,56 @@
 # Implementation status
 
-Status on 2026-10-17. **Not alpha-ready. No compiled Aether browser.**
+Snapshot: 2026-10-17. **Not alpha-ready. No working Aether executable is verified.**
 
 | Area | Current state |
 |---|---|
-| Repository investigation | Completed for locked common/Windows/Linux sources |
-| Base/build reproducibility | Pinned bootstrap and real upstream build driver implemented; actual hosted Windows/Linux build attempts underway; executable not yet verified |
-| Identity/profiles | Source patches for Windows and Linux; runtime coexistence untested |
-| Original branding | SVG/native vector/raster build generation; OS appearance untested |
-| Compact/Classic/Vertical | Existing Helium native implementations reused; Compact default patched; Aether runtime untested |
-| Local onboarding | Six real UI steps, bounded model, draft persistence, native message handler and preference application implemented in source |
-| Themes/accent/density | Native integration source; browser compile/GUI tests pending |
-| Resource profiles | Existing Chromium settings wired; no custom discard scheduler |
-| Browser essentials | Inherited from Helium; navigation/download/extension/session smoke tests pending |
-| Settings | Existing Chromium/Helium settings retained; reopen setup at `aether://setup`; no new category system |
-| Workspaces | Not implemented |
-| Command palette | Not implemented |
-| Original new-tab page | Not implemented; upstream page retained |
-| Performance dashboard | Not implemented |
-| Benchmarks | Methodology only; no measurements |
-| Auto-updates/signing | Not implemented; Helium update fetch explicitly blocked |
-| Windows executable/installer | Not produced |
-| Linux executable/package | Not produced |
-| CI | Hosted Windows/Linux full build driver running; Windows spawn defect fixed; SDK 28000 install verified on Windows; native browser result pending. Source checks remain separate. |
+| Upstream | Chromium 155.0.8059.84 / Helium 0.19.4.1 and matching platform revisions pinned |
+| Native builds | Real Windows/Linux source preparation, GN and C/C++ compilation attempted on standard GitHub-hosted runners |
+| Measured limits | Windows attempt 4 and Linux attempt 1 reached the configured 355-minute job limit with spare disk/RAM |
+| Current work | Windows attempt 5 and Linux attempt 2 active; compatible successor jobs queued behind them |
+| Incremental CI | Component builds, no symbols/PGO/ThinLTO; output cache, hash-gated input timestamps, pinned selected source SHA |
+| Continuation | Bounded controller implemented; real dispatch/queue and guard tests passed; native cache checkpoint round trip still unverified |
+| Identity | Independent profile/Windows registration patches; default-path and coexistence runtime tests pending |
+| Layouts | Existing native Helium Compact/Classic/Vertical reused; Compact default; GUI validation pending |
+| Setup | Six local WebUI steps, native preferences/theme/resource integration and recoverable journal implemented in source |
+| Settings | Existing Chromium/Helium settings retained; reopen setup at aether://setup |
+| Browser essentials | Inherited engine functionality; linked-browser smoke tests not yet reached |
+| Workspaces / command palette / custom NTP / dashboard | Not implemented |
+| Updates / signing / installer | Not implemented or produced; Helium update feed explicitly blocked |
+| Browser benchmarks | Not run; no speed, battery or memory-efficiency claim |
 
-Local checks passed: 11 Python tooling tests, 10 Node setup-state tests, compiled
-C++20 policy checks covering 1,296 supported configurations, Windows/Linux exact
-patch application, actual GRIT `.pak`/URL-map compilation, and source-overlay
-refresh/idempotence/manual-edit protection. These are not browser runtime tests.
-Linux profile isolation is patched; Linux executable/desktop/package naming is
-still inherited and requires finishing before a Linux release.
+Source CI [39074683593](https://github.com/atlasru/aether/actions/runs/39074683593)
+passed 17 Python tests, 10 Node tests, compiled/executed C++20 policy checks
+covering 1,296 configurations, real GRIT compilation and both exact patch jobs.
+Earlier local checks covered the initial 11 Python tests and the real pinned
+Siso/g++ cache-tool probe. These are not Chromium runtime tests.
 
-## Alpha gates still open
+Windows attempt 4 reached 27,092/70,804 operations (26,973 local) before GitHub
+sent CTRL+C at its job time limit. Linux attempt 1 reached 33,275/65,046.
+Aether-owned preferences/handler object compilation was not observed in those
+partial logs, so its native C++ API integration remains unverified.
+Full evidence: [HOSTED_BUILDS.md](HOSTED_BUILDS.md).
 
-Compile and link the browser on Windows x64; fix GN/API integration errors. Run
-actual navigation, setup/skip, policy handling, persistence and restart tests.
-Validate native Compact/Classic and their switching without WebContents/session
-loss. Verify sandbox/site isolation, content-blocking filters, private windows,
-downloads, extensions, media/calls and excluded tabs. Check high DPI, narrow
-windows, keyboard/screen reader and reduced motion. Verify separate profiles and
-installer/COM/service coexistence with installed Helium and Chromium. Review
-inherited download-reputation policy and every redistributed asset license.
-Only then produce and test an explicitly labeled alpha package.
+Active native runs:
+* [Windows attempt 5](https://github.com/atlasru/aether/actions/runs/39073857721)
+* [Linux attempt 2](https://github.com/atlasru/aether/actions/runs/39067527723)
 
-Actual builds run on standard GitHub-hosted runners. Windows attempt 1 failed in
-upstream name-substitution worker imports before GN; the driver is fixed and a
-spawn regression passes. Measured D: free space is 236 GB, so no Windows disk
-exhaustion is claimed. Attempt 2 was superseded after observing only SDK 26100.
-Attempt 3 installed hash/signature-verified SDK 28000 successfully. It completed source preparation, overlay and GN, then executed
-1,889/82,373 native build operations before a Clang PCH/module error. Attempt 4
-disables PCH and fixes a secondary cp1252 logging crash. Its available log reaches
-19,590 native operations without those errors; the final result remains pending.
-Compatible out/Default caching and bounded compile windows are implemented for
-future hosted attempts, including hash-gated input timestamp restoration. A local
-real Siso/g++ probe verifies unchanged output reuse and dependent-header rebuild;
-GitHub native-browser cache save/restore remains unverified. Linux attempt 1
-reached its configured 355-minute job limit at 33,275/65,046 native operations.
-Its 705 samples demonstrate spare disk/RAM, not exhaustion. A four-worker cached
-Linux retry is requested; Windows attempt 4 remains independent. No compiled
-browser executable or runtime smoke success is yet confirmed.
-Future builds smoke-test the extracted runtime archive and record its checksum;
-archive IO/path checks are local tooling tests, not native-browser smoke passes.
-See [HOSTED_BUILDS.md](HOSTED_BUILDS.md) for measurements, run links and exact scope.
+Queued successors use the validated bounded controller:
+* [Windows](https://github.com/atlasru/aether/actions/runs/39074702783)
+* [Linux](https://github.com/atlasru/aether/actions/runs/39074703970)
 
-Windows attempt 4 has now reached the configured 355-minute job limit:
-27,092/70,804 operations, 26,973 local. 604 samples show at least 193.7 GiB
-free disk and 7.25 GiB available physical RAM. Four running commands were
-interrupted; no separate compiler diagnostic was found. Windows attempt 5 is
-requested with resumable outputs and extracted-bundle smoke validation.
-Linux retry 39067527723 remains running. Neither platform has a verified browser
-executable yet. Detailed immutable run/artifact links are in HOSTED_BUILDS.md.
+The queued jobs preserve active compilation and wait for its output cache.
+Automatic successors require a full compile window, newly recorded native object
+progress and a registered nonempty cache. Ordinary compiler/test errors stop.
+No saved cache, queued run or successful diagnostic job is a browser build pass.
 
-Bounded native checkpoint continuation is implemented: only time-bounded
-compilation with newly recorded object progress and a registered output cache
-can dispatch another pinned-source pass (maximum four continuations). Compiler
-errors stop. New guard tests and the queued dispatch are awaiting CI verification;
-a cache-driven end-to-end native continuation is not yet verified.
+## Remaining alpha gates
 
-The initial native successor API test returned HTTP 422 with additional dispatch inputs. Dispatch compatibility is being re-tested with only registered
-source_ref/platform fields and cache-persisted bounded counters. No successful
-automatic native checkpoint chain is yet claimed.
-
-Actual service dispatch and queuing passed (inspection run 39074404730) and source
-CI 39074404684 passed 17 Python tests plus the existing checks. The next guard
-hardening prevents a lost/evicted cursor from resetting the automatic bound.
-The native cache checkpoint path remains unverified until a real compile window
-finishes and saves its cache. No linked browser is claimed.
+Link the Windows browser and validate the extracted executable/runtime archive.
+Verify real navigation, setup/skip, theme/layout preference persistence, restart
+and private browsing. Validate native Compact/Classic switching and tab/session
+preservation, default profile isolation, content blocking, sandbox/site isolation,
+downloads, extensions, media, high DPI, keyboard/screen reader and crash recovery.
+Review redistributed licenses and installer/COM/service coexistence before an
+installable alpha. Linux executable/desktop/package naming remains inherited
+and needs finishing before a Linux release.

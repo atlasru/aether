@@ -66,3 +66,24 @@ Its product/icon metadata changes. Installer payload archive internals retain
 their upstream names. WinSparkle is off and the shared update-service predicate
 always rejects Aether requests. Signing and authenticated Aether updates are
 unimplemented. Other optional Helium services retain upstream consent behavior.
+
+## Hosted build control
+
+The engine checkout and output remain outside this repository. Hosted jobs
+prepare locked source before restoring out/Default. Compatibility keys bind the
+image, absolute path, upstream pins and GN arguments; exact keys also bind source
+fingerprints. Siso handles normal dependency/command invalidation. Hash-verified
+input timestamp metadata avoids false cache misses from repeated preparation.
+
+A build-only cursor in the output cache bounds checkpoint continuation. It is
+separate from browser profiles and onboarding state. Explicit requests initialize
+a bound; automatic pinned-source passes preserve it and stop on missing/invalid
+state. Continuation requires observed new object history and a GitHub-registered
+cache. Ordinary compiler failures stop. A step-scoped Actions token dispatches
+successors after cache/evidence upload, without source-write or release rights.
+The request job pins its selected SHA before queued browser jobs start.
+
+Packaging verifies the applied Aether source state, excludes build-tool metadata,
+includes license texts and records an archive checksum. Future browser smoke
+checks execute the extracted distributable. A headless pass still does not verify
+native layout geometry, default OS profile registration or an installer.

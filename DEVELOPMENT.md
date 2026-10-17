@@ -1,7 +1,7 @@
 # Development
 
 Work on `dev` or `feature/*`. Fetch before committing/pushing. Keep `main` for
-validated milestones; this source-only milestone is not an alpha release.
+validated milestones; a partial native compile is not an alpha release.
 
 ## Upstream inspection (2026-10-17)
 
@@ -42,7 +42,8 @@ archive hashes and dependency configuration at the platform/common pins.
 The build workflow on `dev` runs on GitHub-hosted Windows/Linux images. Change
 `ci/build-request.json` to request another actual build. Manual dispatch requires
 that the workflow also exist on the repository default branch; push triggering
-does not. An optional manual `runner_label` selects a provisioned larger runner.
+does not. The dev definition has an optional `runner_label` for a provisioned larger runner;
+extra API inputs also need compatible default-branch registration.
 No paid runner is provisioned or assumed available by the workflow.
 
 Hosted image cleanup removes only listed disposable SDK/language packages,
@@ -76,3 +77,28 @@ Upstream's core flags include `safe_browsing_mode=0`. Aether does not silently
 change this inherited policy and must not advertise Google Safe Browsing download
 reputation protection. Sandbox/site isolation are not changed by Aether. The
 download/safe-browsing baseline needs a deliberate product decision before alpha.
+
+## Time-bounded native continuation
+
+The standard hosted job cap was actually reached on both platforms; measured
+disk/RAM remained available. New jobs use compile windows so cache/evidence
+preservation has time to finish. Fresh source preparation precedes output restore.
+Only unchanged, hash-verified inputs recover cached timestamps.
+
+Explicit pushes can supersede active work unless queue_after_current is true in
+the build request. Dispatch-created jobs queue. The request job resolves source
+once and all browser jobs use its selected SHA. Explicit queue requests use dev;
+automatic passes pin the current commit and preserve a bounded cache cursor.
+Do not reset an automatic cursor when a cache is lost: further automatic
+continuation is disabled. At most four automatic continuations are permitted.
+
+The real dispatch/queue path and 17 guard/tooling tests passed. Actual native
+cache save/restore and checkpoint-triggered dispatch still await a completed
+compile window. Compiler errors, missing cache state, unregistered caches and
+smoke failures do not become green builds or stable releases. Inspect Actions
+logs and artifacts, not just the separate source-validation workflow.
+
+The evidence inspection workflow reads uploaded compiler logs and annotations on
+a hosted runner when the large raw job-log endpoint cannot return them. Its green
+result only verifies evidence processing. Resource reports, CTRL+C diagnostics
+and immutable run links are recorded in HOSTED_BUILDS.md.

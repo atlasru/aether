@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-10-17T22:27:03.330Z",
+  "code_commit": "bff2150a23bddf6a4d84a5fba464002a8aa9d994",
+  "source_ci": 39074683593,
+  "python_tests": 17,
+  "browser_executable_verified": false,
+  "native_cache_checkpoint_verified": false,
+  "active": {
+    "windows": {
+      "run": 39073857721,
+      "job": 117516874679,
+      "source": "8229a59f14667ca896b2c5f9616e9a1bc766aaa9"
+    },
+    "linux": {
+      "run": 39067527723,
+      "job": 117498195909,
+      "source": "2e14f4e5f3272199fb3db25e7c2e299ddb225fb6"
+    }
+  },
+  "queued": {
+    "windows": {
+      "run": 39074702783,
+      "job": 117519369552,
+      "source": "bff2150a23bddf6a4d84a5fba464002a8aa9d994"
+    },
+    "linux": {
+      "run": 39074703970,
+      "job": 117519372051,
+      "source": "bff2150a23bddf6a4d84a5fba464002a8aa9d994"
+    }
+  }
+}

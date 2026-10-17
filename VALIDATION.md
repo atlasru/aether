@@ -5,7 +5,7 @@ The browser acceptance criteria are not met.**
 
 | Check | Observed result | Scope |
 |---|---|---|
-| Python tooling tests | 11 passed | Pins, patches/resources, actual spawn/encoding regression, output-cache identity, hash-gated input metadata and archive IO/path checks |
+| Python tooling tests | 17 passed in CI | Prior 11 tooling/archive checks plus six bounded-continuation/counter/history guards |
 | Node setup-state tests | 10 passed | Defaults, recovery/back, schema downgrade, malformed values, preset independence, interrupted reconfiguration |
 | Native portable policy | Compiled with g++ C++20, warnings as errors; executed successfully | 1,296 supported combinations plus invalid range/schema rejection; not Chromium C++ integration |
 | Windows patches | Passed | 17 touched files reconstructed from pinned Chromium and every relevant common/Windows hunk; zero fuzz |
@@ -69,3 +69,18 @@ Windows retry is requested; Linux retry remains active.
 New continuation guard tests cover progress, normal compiler failures, registered
 cache requirements and the four-continuation bound. Their new CI result is
 pending; they do not compile Chromium or prove the cache-driven dispatch path.
+
+Latest reviewed source CI: 39074683593 at
+bff2150a23bddf6a4d84a5fba464002a8aa9d994: all three jobs passed, including
+17 Python tests, 10 Node tests and 1,296 compiled/executed policy configurations.
+Real dispatches queued Windows/Linux successors in runs 39074702783 and
+39074703970. These superseded older pending diagnostic successors, without
+interrupting active compilation. The earlier HTTP 422 dispatch test was corrected
+by using the shared registered source_ref/platform fields; the exact rejected
+field/type was not logged in that initial response.
+
+The four FAILED Windows commands in attempt 4 explicitly report exit
+-1073741510 (Application Exit by CTRL+C), matching GitHub's 5h55m timeout
+annotation. No independent compiler diagnostic was found in the preserved log.
+A working executable, native cache checkpoint round trip and browser/GUI smoke
+pass remain unverified. Current status is summarized in ROADMAP.md.
