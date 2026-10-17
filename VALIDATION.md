@@ -5,7 +5,7 @@ The browser acceptance criteria are not met.**
 
 | Check | Observed result | Scope |
 |---|---|---|
-| Python tooling tests | 9 passed | Pins, patch scope, resources, actual spawn/encoding regression, compatible output-cache identity and hash-gated input metadata |
+| Python tooling tests | 11 passed | Pins, patches/resources, actual spawn/encoding regression, output-cache identity, hash-gated input metadata and archive IO/path checks |
 | Node setup-state tests | 10 passed | Defaults, recovery/back, schema downgrade, malformed values, preset independence, interrupted reconfiguration |
 | Native portable policy | Compiled with g++ C++20, warnings as errors; executed successfully | 1,296 supported combinations plus invalid range/schema rejection; not Chromium C++ integration |
 | Windows patches | Passed | 17 touched files reconstructed from pinned Chromium and every relevant common/Windows hunk; zero fuzz |

@@ -112,6 +112,13 @@ def prepare(target, work):
     print(json.dumps(after, indent=2), flush=True)
 
 
+def collect_build_metadata(output, evidence):
+    for name in ("args.gn", ".ninja_log", ".ninja_deps"):
+        path = output / name
+        if path.is_file() and path.stat().st_size < 64 * 1024**2:
+            shutil.copy2(path, evidence / name.lstrip("."))
+
+
 def cache_info(target, work):
     # Generated commands contain absolute SDK/source paths. Never restore an
     # output tree across toolchain images, upstream pins, paths or GN arguments.
@@ -141,6 +148,9 @@ def cache_info(target, work):
     evidence = ROOT / "dist/hosted"
     evidence.mkdir(parents=True, exist_ok=True)
     (evidence / "output-cache.json").write_text(json.dumps(identity, indent=2), encoding="utf-8")
+    # The build wrapper may have been stopped by a step time limit. Preserve
+    # actual GN arguments and incremental history from this independent step.
+    collect_build_metadata(output, evidence)
     if os.environ.get("GITHUB_OUTPUT"):
         with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as stream:
             stream.write(f"cache-prefix={identity['cache_prefix']}\n")
@@ -185,10 +195,7 @@ def build(target, work, jobs, *, prepare_only=False):
               "final": snapshot(target, work), "scope": "Actual source preparation" if prepare_only else "Actual GN and Chromium compilation attempt"}
     (evidence / (prefix + "result.json")).write_text(json.dumps(report, indent=2))
     source = work / target / "build/src"
-    for name in ("args.gn", ".ninja_log", ".ninja_deps"):
-        path = source / "out/Default" / name
-        if path.is_file() and path.stat().st_size < 64 * 1024**2:
-            shutil.copy2(path, evidence / name.lstrip("."))
+    collect_build_metadata(source / "out/Default", evidence)
     print(json.dumps(report, indent=2), flush=True)
     return result
 

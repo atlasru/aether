@@ -154,13 +154,17 @@ jobs:
         run: python scripts/runtime.py ${{ matrix.platform }} --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src"
       - name: Test actual browser navigation and setup
         shell: bash
-        run: python scripts/smoke.py --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src" --output dist/smoke.json
+        run: |
+          extension=zip
+          if [ '${{ matrix.platform }}' = linux ]; then extension=tar.gz; fi
+          python scripts/smoke.py --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src" --archive "dist/runtime/aether-component-${{ matrix.platform }}-x64.$extension" --output dist/smoke.json
       - name: Upload executable/runtime when compilation produced it
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: aether-runtime-${{ matrix.platform }}-${{ github.run_id }}
           path: dist/runtime/
+          compression-level: 0
           if-no-files-found: ignore
           retention-days: 7
       - name: Preserve actual logs and measured hardware/resource evidence, including failures

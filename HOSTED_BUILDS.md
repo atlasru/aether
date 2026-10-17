@@ -43,6 +43,13 @@ build. Failed preparation or linking leaves the build red.
   verify GitHub's cache service or a complete Chromium browser build.
 * Archive runtime files, excluding obj/, gen/ and PDBs. This reduces artifact size,
   not peak compiler storage. Component builds also do not reduce source size.
+  Siso helpers/metadata are excluded and Linux file symlinks are dereferenced so
+  archives do not point back into an ephemeral build directory. Record the
+  runtime archive SHA-256. Future jobs execute smoke checks from the extracted
+  distributable archive, with all its component libraries, rather than out/.
+  Already-compressed ZIP/TAR files upload with artifact compression level zero.
+  Packaging requires the matching applied Aether source state and includes
+  Aether/Helium/Chromium license texts and the attribution document.
 
 No sandbox/site-isolation or foreground web behavior changes are made for this
 configuration. This is an experimental build configuration, not an optimized
@@ -52,7 +59,9 @@ release or an asserted performance improvement.
 
 Each job records before/after cleanup disk and physical RAM, CPU count, OS image,
 compiler/SDK versions, resource samples every 30 seconds, the streamed build log,
-exit code, elapsed time, args.gn and available Ninja metadata. These upload as
+exit code, elapsed time, args.gn and available Ninja metadata. The post-compile
+cache-info step also copies actual args.gn/Ninja history if a step time limit
+interrupted the wrapper's final report. These upload as
 `aether-build-evidence-<platform>-<run id>`, including failed attempts. Runtime
 artifacts are separate and their smoke-test result must be checked on the run.
 

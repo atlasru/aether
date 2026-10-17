@@ -19,8 +19,10 @@ import subprocess
 import tempfile
 from threading import Thread
 import time
+import tarfile
 import urllib.error
 import urllib.request
+import zipfile
 
 from common import ROOT, fingerprint, head, lock
 
@@ -146,13 +148,37 @@ def setup(driver, *, skip=False):
     driver.wait(lambda: driver.command("GET", "/url").startswith(("chrome://newtab", "aether://newtab")))
 
 
-def perform(source: Path, output: Path):
+@contextmanager
+def runtime_directory(source, archive):
+    if archive is None:
+        yield source / "out/Default"
+        return
+    prefix = "aether-component-" + ("windows" if os.name == "nt" else "linux") + "-x64"
+    with tempfile.TemporaryDirectory(prefix="aether-runtime-") as temp:
+        destination = Path(temp)
+        if archive.suffix == ".zip":
+            with zipfile.ZipFile(archive) as stream:
+                for name in stream.namelist():
+                    path = Path(name)
+                    if path.is_absolute() or ".." in path.parts or not path.parts or path.parts[0] != prefix:
+                        raise ValueError(f"Unexpected runtime archive path: {name}")
+                stream.extractall(destination)
+        else:
+            with tarfile.open(archive) as stream:
+                stream.extractall(destination, filter="data")
+        directory = destination / prefix
+        if not directory.is_dir():
+            raise FileNotFoundError(directory)
+        yield directory
+
+
+def perform(source: Path, output: Path, *, directory=None, archive=None):
     state = json.loads((source / ".aether-state.json").read_text())
     if state.get("status") != "applied" or state["fingerprint"] != fingerprint():
         raise RuntimeError("Build source does not match this Aether checkout")
     if os.name != "nt" and hasattr(os, "geteuid") and os.geteuid() == 0:
         raise RuntimeError("Run Linux browser smoke tests as a regular user with its sandbox intact")
-    directory = source / "out/Default"
+    directory = directory or source / "out/Default"
     binary = directory / ("chrome.exe" if os.name == "nt" else "helium")
     driver_binary = directory / ("chromedriver.exe" if os.name == "nt" else "chromedriver")
     for file in (binary, driver_binary):
@@ -217,6 +243,9 @@ def perform(source: Path, output: Path):
             passed.append("private navigation")
         report = {"result": "passed", "commit": head(ROOT), "source_fingerprint": fingerprint(),
                   "binary_sha256": digest(binary), "driver_sha256": digest(driver_binary),
+                  "runtime_archive": archive.name if archive else None,
+                  "runtime_archive_sha256": digest(archive) if archive else None,
+                  "runtime_origin": "extracted artifact" if archive else "build output directory",
                   "upstream": lock(), "capabilities": capabilities, "checks": passed,
                   "limits": "Headless smoke only. No GUI layout, OS installer, download security, extension, crash-injection or public-network validation."}
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -231,6 +260,9 @@ def perform(source: Path, output: Path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", required=True, type=Path)
+    parser.add_argument("--archive", type=Path, help="Run binaries extracted from the distributable runtime archive")
     parser.add_argument("--output", type=Path, default=ROOT / "dist/smoke.json")
     args = parser.parse_args()
-    perform(args.source.resolve(), args.output.resolve())
+    archive = args.archive.resolve() if args.archive else None
+    with runtime_directory(args.source.resolve(), archive) as directory:
+        perform(args.source.resolve(), args.output.resolve(), directory=directory, archive=archive)
