@@ -20,6 +20,19 @@ build. Failed preparation or linking leaves the build red.
   scripts/prepare.py and scripts/package.py. They retain build metadata and tools.
 * Disable local sccache for the low-resource configuration to avoid duplicating
   object files on an ephemeral disk. Incremental developer builds retain out/.
+* Hosted follow-up attempts prepare the pinned source first, then restore only
+  out/Default through GitHub's native cache service. Cache identity includes the
+  actual ImageVersion, absolute source path, source/patch/build-driver fingerprint
+  and effective GN arguments. A fresh unique cache entry retains completed work
+  from failed or time-bounded compilation; modified inputs invalidate the cache.
+  There is no source-tree cache and no cache in the Git repository.
+* A hosted compile step has a 240-minute window, reserving time within the
+  355-minute job for output-cache preservation and evidence uploads. Expiration
+  fails the compile/job; a saved cache is not a browser artifact or build success.
+  A later explicit build request with matching identity can continue incrementally.
+  Actual cache size is recorded, and cache availability, quota and usefulness
+  must be verified from the native run. No successful native cache restore or
+  complete browser build is claimed by the local cache-identity test.
 * Archive runtime files, excluding obj/, gen/ and PDBs. This reduces artifact size,
   not peak compiler storage. Component builds also do not reduce source size.
 
@@ -140,3 +153,16 @@ The last console sample still had 138,612,543,488 bytes free on D:. No RAM, disk
 or hosted time-limit failure was demonstrated in this Windows attempt.
 No browser executable was produced. Native result and exact failed target:
 [docs/builds/attempt-3-windows/native-result.json](docs/builds/attempt-3-windows/native-result.json).
+
+## Attempt 4 — observed progress, result pending
+
+Run [39047759315](https://github.com/atlasru/aether/actions/runs/39047759315),
+source `598df4d741af4c37fc7457814f84690031b62cc6`, passed source preparation,
+the Aether overlay and GN (35,610 targets / 5,000 files). The available native log
+reaches 12,115 / 80,074 operations at 2026-10-17 18:30:52 UTC, after 2h01m42s of
+compilation. No PCH failure or console encoding error appears in this log. The
+latest available disk sample was 213,829,021,696 free bytes on D: at 18:30:22 UTC.
+This is observed progress, not a completed executable or a demonstrated resource
+limit. The job and the independent first Linux job are still running as of the
+19:32 UTC status check. Output-cache changes apply to future jobs and do not
+interrupt or modify either active job.

@@ -100,9 +100,44 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends bison flex gperf ninja-build pkg-config zstd xz-utils libasound2-dev libatk1.0-dev libatk-bridge2.0-dev libcups2-dev libdbus-1-dev libdrm-dev libgbm-dev libglib2.0-dev libgtk-3-dev libnss3-dev libpango1.0-dev libpulse-dev libx11-dev libx11-xcb-dev libxcb1-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxrandr-dev libxrender-dev libxss-dev libxtst-dev libxkbcommon-dev libxshmfence-dev libudev-dev libpci-dev libpipewire-0.3-dev libkrb5-dev
           sudo apt-get clean
-      - name: Actually prepare, generate GN and compile Chromium
+      - name: Prepare actual pinned Chromium source and Aether overlay
+        id: source
+        shell: bash
+        timeout-minutes: 60
+        run: python scripts/hosted.py source ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR" -j 4
+      - name: Identify compatible compiled outputs
+        id: identity
+        shell: bash
+        run: python scripts/hosted.py cache-info ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
+      - name: Restore compatible incremental compiler output
+        id: objects
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        timeout-minutes: 15
+        with:
+          path: ${{ env.AETHER_WORK_DIR }}/${{ matrix.platform }}/build/src/out/Default
+          key: ${{ steps.identity.outputs.cache-prefix }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ steps.identity.outputs.cache-prefix }}-
+      - name: Actually generate GN and compile Chromium
+        id: compile
+        # Leave time to preserve real outputs and diagnostics before the job cap.
+        # An expired compile window fails this job; it never implies success.
+        timeout-minutes: 240
         shell: bash
         run: python scripts/hosted.py build ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR" -j 4
+      - name: Measure actual incremental output size
+        if: always() && steps.identity.outcome == 'success' && !cancelled()
+        shell: bash
+        run: python scripts/hosted.py cache-info ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
+      - name: Preserve compiler output including an interrupted compile window
+        if: always() && steps.identity.outcome == 'success' && !cancelled()
+        # A storage/quota failure must not prevent packaging a compiled browser.
+        continue-on-error: true
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        timeout-minutes: 20
+        with:
+          path: ${{ env.AETHER_WORK_DIR }}/${{ matrix.platform }}/build/src/out/Default
+          key: ${{ steps.identity.outputs.cache-prefix }}-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Archive compiled browser and component runtime
         shell: bash
         run: python scripts/runtime.py ${{ matrix.platform }} --source "$AETHER_WORK_DIR/${{ matrix.platform }}/build/src"

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -18,7 +19,7 @@ import sys
 from threading import Thread, Event
 import time
 
-from common import ROOT
+from common import ROOT, fingerprint
 from doctor import inspect
 
 
@@ -111,16 +112,49 @@ def prepare(target, work):
     print(json.dumps(after, indent=2), flush=True)
 
 
-def build(target, work, jobs):
+def cache_info(target, work):
+    # Generated commands contain absolute SDK/source paths. Never restore an
+    # output tree across images, paths, source/driver changes or GN arguments.
+    from build import gn_arguments
+    image = os.environ.get("ImageVersion")
+    if not image:
+        raise RuntimeError("Runner ImageVersion is required for compiled-output caching")
+    source = work / target / "build/src"
+    flags = gn_arguments(work / target, target, low_resource=True)
+    identity = {"platform": target, "image": image, "source": str(source),
+                "fingerprint": fingerprint(), "gn_arguments": flags}
+    key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+    identity["cache_prefix"] = f"aether-out-v1-{target}-{key}"
+    output = source / "out/Default"
+    count = size = 0
+    if output.is_dir():
+        for path in output.rglob("*"):
+            if path.is_file():
+                count += 1
+                size += path.stat().st_size
+    identity.update(output_files=count, output_logical_bytes=size)
+    evidence = ROOT / "dist/hosted"
+    evidence.mkdir(parents=True, exist_ok=True)
+    (evidence / "output-cache.json").write_text(json.dumps(identity, indent=2), encoding="utf-8")
+    if os.environ.get("GITHUB_OUTPUT"):
+        with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as stream:
+            stream.write(f"cache-prefix={identity['cache_prefix']}\n")
+    print(json.dumps(identity, indent=2), flush=True)
+
+
+def build(target, work, jobs, *, prepare_only=False):
     configure_console()
     evidence = ROOT / "dist/hosted"
     evidence.mkdir(parents=True, exist_ok=True)
     args = [sys.executable, "-u", str(ROOT / "scripts/build.py"), target,
             "--work-dir", str(work), "--attempt", "--low-resource", "--browser-only", "-j", str(jobs)]
+    if prepare_only:
+        args.append("--prepare-only")
+    prefix = "source-" if prepare_only else ""
     start = time.monotonic()
     stop = Event()
     def monitor():
-        with (evidence / "resources.jsonl").open("a", encoding="utf-8") as stream:
+        with (evidence / (prefix + "resources.jsonl")).open("a", encoding="utf-8") as stream:
             while not stop.is_set():
                 sample = snapshot(target, work)
                 stream.write(json.dumps(sample) + "\n")
@@ -132,7 +166,7 @@ def build(target, work, jobs):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                text=True, encoding="utf-8", errors="replace", bufsize=1)
     try:
-        with (evidence / "build.log").open("w", encoding="utf-8") as stream:
+        with (evidence / (prefix + "build.log")).open("w", encoding="utf-8") as stream:
             for line in process.stdout:
                 stream.write(line)
                 stream.flush()
@@ -142,8 +176,8 @@ def build(target, work, jobs):
         stop.set()
         thread.join(timeout=5)
     report = {"command": args, "exit_code": result, "elapsed_seconds": time.monotonic()-start,
-              "final": snapshot(target, work), "scope": "Actual upstream source preparation, GN and Chromium compilation attempt"}
-    (evidence / "result.json").write_text(json.dumps(report, indent=2))
+              "final": snapshot(target, work), "scope": "Actual source preparation" if prepare_only else "Actual GN and Chromium compilation attempt"}
+    (evidence / (prefix + "result.json")).write_text(json.dumps(report, indent=2))
     source = work / target / "build/src"
     for name in ("args.gn", ".ninja_log", ".ninja_deps"):
         path = source / "out/Default" / name
@@ -156,7 +190,7 @@ def build(target, work, jobs):
 if __name__ == "__main__":
     configure_console()
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("select-path", "prepare", "build"))
+    parser.add_argument("action", choices=("select-path", "prepare", "source", "cache-info", "build"))
     parser.add_argument("platform", choices=("windows", "linux"))
     parser.add_argument("--work-dir", type=Path)
     parser.add_argument("-j", "--jobs", type=int, default=2)
@@ -166,7 +200,10 @@ if __name__ == "__main__":
         sys.exit(0)
     if args.work_dir is None:
         parser.error("--work-dir is required for prepare/build")
-    if args.action == "prepare":
+    if args.action == "cache-info":
+        cache_info(args.platform, args.work_dir.resolve())
+    elif args.action == "prepare":
         prepare(args.platform, args.work_dir.resolve())
     else:
-        sys.exit(build(args.platform, args.work_dir.resolve(), args.jobs))
+        sys.exit(build(args.platform, args.work_dir.resolve(), args.jobs,
+                       prepare_only=args.action == "source"))
