@@ -1,0 +1,43 @@
+name: Inspect actual build evidence
+on:
+  push:
+    branches: [dev]
+    paths: ['ci/evidence-request.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - id: request
+        run: |
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          request = json.loads(Path('ci/evidence-request.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              for key in ('run', 'job', 'artifact'):
+                  stream.write(f'{key}={request[key]}\n')
+          PYTHON
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ${{ steps.request.outputs.artifact }}
+          run-id: ${{ steps.request.outputs.run }}
+          github-token: ${{ github.token }}
+          path: dist/downloaded-evidence
+      - name: Read actual compiler log, resource samples and GitHub annotations
+        env:
+          AETHER_ACTIONS_TOKEN: ${{ github.token }}
+        run: python3 scripts/inspect_build_evidence.py --root dist/downloaded-evidence --job-id ${{ steps.request.outputs.job }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: inspected-build-evidence-${{ github.run_id }}
+          path: dist/inspection/
+          if-no-files-found: error
+          retention-days: 7
