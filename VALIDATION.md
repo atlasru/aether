@@ -14,7 +14,7 @@ The browser acceptance criteria are not met.**
 | Name substitution | Passed | Real GRIT message fingerprint recalculation; recovery backups excluded |
 | Source overlay lifecycle | Passed | Actual sparse patch/overlay application, independent version injection, refresh, idempotence and external-edit rejection; icons/string bulk stage tested separately |
 | Branding raster generation | Passed | Seven local PNG sizes: 16/24/32/48/64/128/256 px, transparent corners |
-| Workflow YAML | Parsed locally | GitHub execution results are separate |
+| Hosted GitHub Actions | Passed, 3/3 jobs | Tooling/configuration + real GRIT, exact Windows patches, exact Linux patches |
 | Windows build preflight | Failed as expected | Linux host; about 30 GiB free disk and 9.7 GiB RAM; no Windows/VS/SDK |
 | Chromium GN/link/browser smoke | Not run | No complete source/build environment |
 | Browser/installer/GUI/security validation | Not run | Native layout, downloads, extension compatibility, sandbox runtime, OS registration, DPI, accessibility and crash injection remain open |
@@ -34,5 +34,8 @@ workflow, so uncompiled browser source is not presented as stable.
 
 Exact per-file baseline/patch hashes and resource compilation evidence are in
 `docs/validation/2026-10-17/`. CI uploads fresh reports for the checked commit.
-The repository's first CI run will be inspected after the workflow commit; no
-successful CI run is implied by merely adding a workflow.
+Observed GitHub run: [Validate source #1](https://github.com/atlasru/aether/actions/runs/39040530229),
+commit `63906e7e9b62b8713491fd87d97f323754304bed`, completed successfully.
+All three jobs and their resource/artifact upload steps were inspected. This run
+does not include the manual self-hosted browser build workflow. That build has
+not been run and no working executable is claimed.

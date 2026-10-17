@@ -22,7 +22,7 @@ Status on 2026-10-17. **Not alpha-ready. No compiled Aether browser.**
 | Auto-updates/signing | Not implemented; Helium update fetch explicitly blocked |
 | Windows executable/installer | Not produced |
 | Linux executable/package | Not produced |
-| CI | Hosted source/resource/patch workflows and manual self-hosted full-build pipeline implemented; see VALIDATION.md for observed run status |
+| CI | Hosted source/resource/patch run passed all 3 jobs at `63906e7e9b62b8713491fd87d97f323754304bed`; manual self-hosted full build has not run |
 
 Local checks passed: 4 Python tooling tests, 10 Node setup-state tests, compiled
 C++20 policy checks covering 1,296 supported configurations, Windows/Linux exact
