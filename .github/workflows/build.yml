@@ -17,6 +17,14 @@ on:
         type: string
         default: ''
         description: Optional existing larger-runner label (choose one platform)
+      queue_after_current:
+        type: boolean
+        default: false
+        description: Queue behind an active build without discarding its progress
+      continuation:
+        type: number
+        default: 0
+        description: Internal bounded native-checkpoint counter (0-4)
 permissions:
   contents: read
 jobs:
@@ -25,6 +33,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       platforms: ${{ steps.select.outputs.platforms }}
+      queue: ${{ steps.select.outputs.queue }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -33,12 +42,18 @@ jobs:
       - id: select
         env:
           REQUESTED_PLATFORM: ${{ inputs.platform || 'both' }}
+          REQUESTED_QUEUE: ${{ inputs.queue_after_current }}
         run: |
           python3 - <<'PYTHON'
           import json, os
           from pathlib import Path
           selected = os.environ['REQUESTED_PLATFORM']
-          platforms = (json.loads(Path('ci/build-request.json').read_text())['platforms']
+          request = json.loads(Path('ci/build-request.json').read_text())
+          queued = (request.get('queue_after_current', False) if os.environ['GITHUB_EVENT_NAME'] == 'push'
+                    else os.environ['REQUESTED_QUEUE'] == 'true')
+          if type(queued) is not bool:
+              raise ValueError('queue_after_current must be a boolean')
+          platforms = (request['platforms']
                        if os.environ['GITHUB_EVENT_NAME'] == 'push'
                        else ['windows', 'linux'] if selected == 'both' else [selected])
           if (not isinstance(platforms, list) or not platforms or
@@ -47,12 +62,16 @@ jobs:
               raise ValueError('Build request must select windows and/or linux')
           with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
               out.write('platforms=' + json.dumps(platforms) + '\n')
+              out.write('queue=' + str(queued).lower() + '\n')
           PYTHON
   browser:
     needs: request
+    permissions:
+      contents: read
+      actions: write
     concurrency:
       group: compile-${{ github.ref }}-${{ matrix.platform }}
-      cancel-in-progress: true
+      cancel-in-progress: ${{ needs.request.outputs.queue != 'true' }}
     name: Real Chromium build (${{ matrix.platform }})
     strategy:
       fail-fast: false
@@ -141,6 +160,7 @@ jobs:
         shell: bash
         run: python scripts/hosted.py capture-inputs ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
       - name: Preserve compiler output including an interrupted compile window
+        id: save_objects
         if: always() && steps.timestamps.outcome == 'success' && !cancelled()
         # A storage/quota failure must not prevent packaging a compiled browser.
         continue-on-error: true
@@ -177,3 +197,13 @@ jobs:
             dist/smoke.json
           if-no-files-found: warn
           retention-days: 7
+      - name: Continue a native checkpoint only after verified object and cache progress
+        if: always() && steps.compile.outcome == 'failure' && steps.save_objects.outcome == 'success' && !cancelled()
+        continue-on-error: true
+        shell: bash
+        env:
+          AETHER_ACTIONS_TOKEN: ${{ github.token }}
+          AETHER_CACHE_KEY: ${{ steps.objects.outputs.cache-primary-key }}
+          AETHER_CONTINUATION: ${{ inputs.continuation || 0 }}
+          AETHER_RUNNER_LABEL: ${{ inputs.runner_label || '' }}
+        run: python scripts/continue_build.py --platform ${{ matrix.platform }} --count "$AETHER_CONTINUATION" --cache-key "$AETHER_CACHE_KEY" --runner-label "$AETHER_RUNNER_LABEL"

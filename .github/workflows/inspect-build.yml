@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  actions: read
+  actions: write
+  checks: read
 jobs:
   inspect:
     runs-on: ubuntu-24.04
@@ -24,6 +25,7 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
               for key in ('run', 'job', 'artifact'):
                   stream.write(f'{key}={request[key]}\n')
+              stream.write('queue=' + str(request.get('queue_next_build', False)).lower() + '\n')
           PYTHON
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
@@ -41,3 +43,8 @@ jobs:
           path: dist/inspection/
           if-no-files-found: error
           retention-days: 7
+      - name: Queue authorized native Windows and Linux successors
+        if: steps.request.outputs.queue == 'true'
+        env:
+          AETHER_ACTIONS_TOKEN: ${{ github.token }}
+        run: python3 scripts/continue_build.py --queue --platform both

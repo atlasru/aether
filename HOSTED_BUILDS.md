@@ -265,3 +265,23 @@ A fresh Windows request now uses compatible output caching, hash-gated input
 timestamps and a compile checkpoint window. The old attempt retained logs, not
 objects. Linux retry 39067527723 continues independently with four workers.
 No executable build success or native-browser cache round trip is claimed yet.
+
+## Bounded native checkpoint continuation
+
+A checkpoint window can dispatch a successor on dev with the same pinned source
+commit, after evidence upload. It requires a full compile window, no normal
+compiler-result JSON, an actual native-start marker, newly completed object
+records in Ninja history and a nonempty cache entry registered by GitHub under
+this run's exact key. Compiler/configuration errors and smoke failures stop.
+Each dispatch increments a counter, capped at four continuations. Jobs remain
+red when a compile window expires; continuation never means a successful build.
+A queued successor leaves an active predecessor running so it can save its work.
+An explicit new request can still supersede a platform's active work.
+
+The dispatch token is step-scoped after cache/evidence upload and has Actions
+write permission only alongside read-only repository contents. No personal token
+or new secret is required. GitHub explicitly supports workflow_dispatch from
+GITHUB_TOKEN. The actual cache-driven continuation path awaits its first native
+checkpoint; source/guard checks and a real queued native dispatch are verified
+separately. Inspect-build's queue request is an actual native workflow dispatch,
+not a fabricated compiler completion.

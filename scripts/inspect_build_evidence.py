@@ -44,6 +44,8 @@ report = {
     "errors": [line[:6000] for line in lines if re.search(
         r"\berror(?:\[[^\]]+\])?:|^FAILED:|fatal error|No space left|out of memory|Traceback|KeyboardInterrupt",
         line, re.I)][-20:],
+    "failure_contexts": [[entry[:1800] for entry in lines[max(0, index-1):index+7]]
+                         for index, value in enumerate(lines) if value.startswith("FAILED:")][-6:],
     "aether_objects": [line for line in lines if re.search(
         r"aether[/\\](?:aether[/\\])?preferences|aether_setup_handler", line)][-10:],
     "tail": lines[-24:],

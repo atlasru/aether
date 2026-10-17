@@ -65,3 +65,7 @@ GitHub's exact timeout annotation. The native counter reached 27,092/70,804 with
 run 39073497261. The inspection workflow's success means evidence was read,
 not that a browser built. No working executable or browser smoke pass is claimed.
 Windows retry is requested; Linux retry remains active.
+
+New continuation guard tests cover progress, normal compiler failures, registered
+cache requirements and the four-continuation bound. Their new CI result is
+pending; they do not compile Chromium or prove the cache-driven dispatch path.

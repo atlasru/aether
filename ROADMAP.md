@@ -70,3 +70,9 @@ interrupted; no separate compiler diagnostic was found. Windows attempt 5 is
 requested with resumable outputs and extracted-bundle smoke validation.
 Linux retry 39067527723 remains running. Neither platform has a verified browser
 executable yet. Detailed immutable run/artifact links are in HOSTED_BUILDS.md.
+
+Bounded native checkpoint continuation is implemented: only time-bounded
+compilation with newly recorded object progress and a registered output cache
+can dispatch another pinned-source pass (maximum four continuations). Compiler
+errors stop. New guard tests and the queued dispatch are awaiting CI verification;
+a cache-driven end-to-end native continuation is not yet verified.
