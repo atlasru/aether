@@ -76,3 +76,8 @@ compilation with newly recorded object progress and a registered output cache
 can dispatch another pinned-source pass (maximum four continuations). Compiler
 errors stop. New guard tests and the queued dispatch are awaiting CI verification;
 a cache-driven end-to-end native continuation is not yet verified.
+
+The initial native successor API test returned HTTP 422 (legacy default-branch
+input schema). Dispatch compatibility is being re-tested with only registered
+source_ref/platform fields and cache-persisted bounded counters. No successful
+automatic native checkpoint chain is yet claimed.

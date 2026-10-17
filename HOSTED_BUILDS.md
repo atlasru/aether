@@ -285,3 +285,12 @@ GITHUB_TOKEN. The actual cache-driven continuation path awaits its first native
 checkpoint; source/guard checks and a real queued native dispatch are verified
 separately. Inspect-build's queue request is an actual native workflow dispatch,
 not a fabricated compiler completion.
+
+The first real dispatch test returned HTTP 422 because GitHub validates inputs
+against the default-branch workflow's legacy schema. The corrected dispatcher
+sends only its registered source_ref/platform fields and dispatches Windows and
+Linux separately. Dispatch-created jobs queue behind active work. The bounded
+counter is stored in the output cache with its source fingerprint; explicit
+push requests or new source reset it. Invalid counters disable automatic
+continuation. The correction awaits a real API re-test; no successful queued
+successor is claimed from the failed dispatch.

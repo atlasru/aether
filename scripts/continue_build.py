@@ -12,16 +12,49 @@ from pathlib import Path
 import re
 import subprocess
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
 MAX_CONTINUATIONS = 4
+CURSOR = ".aether-compile-window.json"
 COMPILE_WINDOW_SECONDS = 240 * 60
 
 def eligible(*, elapsed, result_exists, native_started, new_objects, cache_bytes, count):
     return (0 <= count < MAX_CONTINUATIONS and
             elapsed >= COMPILE_WINDOW_SECONDS - 30 and not result_exists and
             native_started and new_objects > 0 and cache_bytes > 0)
+
+def checkpoint_count(cursor, source_fingerprint, explicit):
+    if explicit:
+        return 0
+    if not isinstance(cursor, dict):
+        return MAX_CONTINUATIONS
+    if cursor.get("source_fingerprint") != source_fingerprint:
+        return 0
+    count = cursor.get("next_count")
+    return count if type(count) is int and 0 <= count <= MAX_CONTINUATIONS else MAX_CONTINUATIONS
+
+def prepare_checkpoint(source, evidence):
+    from common import fingerprint
+    output = source / "out/Default"
+    output.mkdir(parents=True, exist_ok=True)
+    path = output / CURSOR
+    try:
+        cursor = json.loads(path.read_text()) if path.is_file() else {}
+    except (ValueError, OSError):
+        cursor = {"source_fingerprint": fingerprint(), "next_count": MAX_CONTINUATIONS}
+    source_fingerprint = fingerprint()
+    requested = os.environ.get("AETHER_SOURCE_REF", "")
+    explicit = (os.environ.get("GITHUB_EVENT_NAME") == "push" or
+                not re.fullmatch("[0-9a-f]{40}", requested))
+    count = checkpoint_count(cursor, source_fingerprint, explicit)
+    evidence.mkdir(parents=True, exist_ok=True)
+    (evidence / "checkpoint.json").write_text(json.dumps({"count": count,
+        "source_fingerprint": source_fingerprint}), encoding="utf-8")
+    path.write_text(json.dumps({"source_fingerprint": source_fingerprint,
+        "next_count": count + 1}), encoding="utf-8")
+    return count
 
 def recent_native_objects(path, started):
     if not path.is_file():
@@ -48,11 +81,15 @@ def api(path, body=None):
     request = urllib.request.Request("https://api.github.com/repos/" +
         os.environ["GITHUB_REPOSITORY"] + path, headers=headers, data=data,
         method="POST" if body is not None else "GET")
-    with urllib.request.urlopen(request, timeout=30) as response:
-        data = response.read()
-        return json.loads(data) if data else None
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            data = response.read()
+            return json.loads(data) if data else None
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", "replace")[:3000]
+        raise RuntimeError(f"GitHub API {error.code}: {detail}") from None
 
-def dispatch(platform, count, runner_label=""):
+def dispatch(platform):
     source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     if not re.fullmatch("[0-9a-f]{40}", source):
         raise ValueError("A pinned source commit is required")
@@ -67,14 +104,15 @@ def dispatch(platform, count, runner_label=""):
         if attempt == 11:
             raise RuntimeError("Source CI is not yet verified; native dispatch not sent")
         time.sleep(5)
-    api("/actions/workflows/build.yml/dispatches", {
-        "ref": "dev", "inputs": {"source_ref": source, "platform": platform,
-        "runner_label": runner_label, "queue_after_current": True,
-        "continuation": count}})
-    print(json.dumps({"dispatch_accepted": True, "source_ref": source,
-                      "platform": platform, "continuation": count}))
+    # The registered default-branch schema accepts source_ref/platform only.
+    # Keep continuation state inside the verified output cache, not extra inputs.
+    for selected in (("windows", "linux") if platform == "both" else (platform,)):
+        api("/actions/workflows/build.yml/dispatches", {
+            "ref": "dev", "inputs": {"source_ref": source, "platform": selected}})
+        print(json.dumps({"dispatch_accepted": True, "source_ref": source, "platform": selected}))
 
-def resume(platform, count, key, runner_label):
+def resume(platform, key):
+    count = json.loads(Path("dist/hosted/checkpoint.json").read_text())["count"]
     jobs = api("/actions/runs/" + os.environ["GITHUB_RUN_ID"] + "/jobs")["jobs"]
     job = next(job for job in jobs if job["name"] == f"Real Chromium build ({platform})")
     step = next(step for step in job["steps"] if step["name"] == "Actually generate GN and compile Chromium")
@@ -101,21 +139,17 @@ def resume(platform, count, key, runner_label):
     if not eligible(**base, cache_bytes=cache_bytes):
         print(json.dumps({"continuation_skipped": "no registered nonempty output cache", **base}))
         return
-    dispatch(platform, count + 1, runner_label)
+    dispatch(platform)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--platform", choices=("windows", "linux", "both"), required=True)
-    parser.add_argument("--count", type=int, default=0)
     parser.add_argument("--queue", action="store_true", help="Explicitly queue the next authorized native build")
     parser.add_argument("--cache-key", default="")
-    parser.add_argument("--runner-label", default="")
     args = parser.parse_args()
-    if not 0 <= args.count <= MAX_CONTINUATIONS:
-        parser.error("continuation must be between zero and four")
     if args.queue:
-        dispatch(args.platform, args.count, args.runner_label)
+        dispatch(args.platform)
     elif args.platform == "both":
         parser.error("checkpoint continuation requires one platform")
     else:
-        resume(args.platform, args.count, args.cache_key, args.runner_label)
+        resume(args.platform, args.cache_key)

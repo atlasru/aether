@@ -218,6 +218,9 @@ if __name__ == "__main__":
         source = args.work_dir.resolve() / args.platform / "build/src"
         action = input_timestamps.capture if args.action == "capture-inputs" else input_timestamps.restore
         report = action(source)
+        if args.action == "restore-inputs":
+            from continue_build import prepare_checkpoint
+            report["continuation"] = prepare_checkpoint(source, ROOT / "dist/hosted")
         evidence = ROOT / "dist/hosted"
         evidence.mkdir(parents=True, exist_ok=True)
         (evidence / (args.action + ".json")).write_text(json.dumps(report, indent=2), encoding="utf-8")

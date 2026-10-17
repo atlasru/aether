@@ -4,7 +4,7 @@ import sys
 import tempfile
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from continue_build import eligible, recent_native_objects
+from continue_build import eligible, recent_native_objects, checkpoint_count
 
 class ContinuationTest(unittest.TestCase):
     def setUp(self):
@@ -22,6 +22,15 @@ class ContinuationTest(unittest.TestCase):
         for count in (-1, 4, 5):
             self.assertFalse(eligible(**dict(self.context, count=count)))
         self.assertTrue(eligible(**dict(self.context, count=3)))
+    def test_checkpoint_counter_survives_automatic_cached_passes(self):
+        cursor = {"source_fingerprint": "same", "next_count": 3}
+        self.assertEqual(checkpoint_count(cursor, "same", False), 3)
+        self.assertEqual(checkpoint_count(cursor, "same", True), 0)
+        self.assertEqual(checkpoint_count(cursor, "changed", False), 0)
+    def test_corrupt_counter_stops_automatic_progression(self):
+        self.assertEqual(checkpoint_count([], "same", False), 4)
+        for value in (-1, 6, "2", True):
+            self.assertEqual(checkpoint_count({"source_fingerprint": "same", "next_count": value}, "same", False), 4)
     def test_progress_comes_from_recent_real_object_history(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "ninja_log"

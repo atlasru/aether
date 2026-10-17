@@ -17,14 +17,6 @@ on:
         type: string
         default: ''
         description: Optional existing larger-runner label (choose one platform)
-      queue_after_current:
-        type: boolean
-        default: false
-        description: Queue behind an active build without discarding its progress
-      continuation:
-        type: number
-        default: 0
-        description: Internal bounded native-checkpoint counter (0-4)
 permissions:
   contents: read
 jobs:
@@ -42,7 +34,6 @@ jobs:
       - id: select
         env:
           REQUESTED_PLATFORM: ${{ inputs.platform || 'both' }}
-          REQUESTED_QUEUE: ${{ inputs.queue_after_current }}
         run: |
           python3 - <<'PYTHON'
           import json, os
@@ -50,7 +41,7 @@ jobs:
           selected = os.environ['REQUESTED_PLATFORM']
           request = json.loads(Path('ci/build-request.json').read_text())
           queued = (request.get('queue_after_current', False) if os.environ['GITHUB_EVENT_NAME'] == 'push'
-                    else os.environ['REQUESTED_QUEUE'] == 'true')
+                    else True)
           if type(queued) is not bool:
               raise ValueError('queue_after_current must be a boolean')
           platforms = (request['platforms']
@@ -84,6 +75,7 @@ jobs:
       PYTHONUTF8: '1'
       PYTHONIOENCODING: 'utf-8'
       DEPOT_TOOLS_WIN_TOOLCHAIN: '0'
+      AETHER_SOURCE_REF: ${{ inputs.source_ref || '' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -204,6 +196,4 @@ jobs:
         env:
           AETHER_ACTIONS_TOKEN: ${{ github.token }}
           AETHER_CACHE_KEY: ${{ steps.objects.outputs.cache-primary-key }}
-          AETHER_CONTINUATION: ${{ inputs.continuation || 0 }}
-          AETHER_RUNNER_LABEL: ${{ inputs.runner_label || '' }}
-        run: python scripts/continue_build.py --platform ${{ matrix.platform }} --count "$AETHER_CONTINUATION" --cache-key "$AETHER_CACHE_KEY" --runner-label "$AETHER_RUNNER_LABEL"
+        run: python scripts/continue_build.py --platform ${{ matrix.platform }} --cache-key "$AETHER_CACHE_KEY"
