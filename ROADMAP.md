@@ -47,14 +47,16 @@ Actual builds run on standard GitHub-hosted runners. Windows attempt 1 failed in
 upstream name-substitution worker imports before GN; the driver is fixed and a
 spawn regression passes. Measured D: free space is 236 GB, so no Windows disk
 exhaustion is claimed. Attempt 2 was superseded after observing only SDK 26100.
-Attempt 3 installs hash/signature-verified SDK 28000 successfully and continues
-full preparation/GN/compilation. Linux attempt 1 also continues. Windows attempt 3 completed source preparation, overlay and GN, then executed
+Attempt 3 installed hash/signature-verified SDK 28000 successfully. It completed source preparation, overlay and GN, then executed
 1,889/82,373 native build operations before a Clang PCH/module error. Attempt 4
 disables PCH and fixes a secondary cp1252 logging crash. Its available log reaches
-12,115 native operations without those errors; the final result remains pending.
+19,590 native operations without those errors; the final result remains pending.
 Compatible out/Default caching and bounded compile windows are implemented for
 future hosted attempts, including hash-gated input timestamp restoration. A local
 real Siso/g++ probe verifies unchanged output reuse and dependent-header rebuild;
-GitHub native-browser cache save/restore remains unverified. No hosted hard resource
-failure, compiled executable or runtime smoke success is yet confirmed.
+GitHub native-browser cache save/restore remains unverified. Linux attempt 1
+reached its configured 355-minute job limit at 33,275/65,046 native operations.
+Its 705 samples demonstrate spare disk/RAM, not exhaustion. A four-worker cached
+Linux retry is requested; Windows attempt 4 remains independent. No compiled
+browser executable or runtime smoke success is yet confirmed.
 See [HOSTED_BUILDS.md](HOSTED_BUILDS.md) for measurements, run links and exact scope.

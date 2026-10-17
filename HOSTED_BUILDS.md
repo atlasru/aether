@@ -167,13 +167,48 @@ No browser executable was produced. Native result and exact failed target:
 Run [39047759315](https://github.com/atlasru/aether/actions/runs/39047759315),
 source `598df4d741af4c37fc7457814f84690031b62cc6`, passed source preparation,
 the Aether overlay and GN (35,610 targets / 5,000 files). The available native log
-reaches 12,115 / 80,074 operations at 2026-10-17 18:30:52 UTC, after 2h01m42s of
+reaches 19,590 / 74,300 operations at 2026-10-17 19:35:43 UTC, after 3h06m33s of
 compilation. No PCH failure or console encoding error appears in this log. The
-latest available disk sample was 213,829,021,696 free bytes on D: at 18:30:22 UTC.
+latest available disk sample was 216,809,811,968 free bytes on D: at 19:35:32 UTC.
 This is observed progress, not a completed executable or a demonstrated resource
-limit. The job and the independent first Linux job are still running as of the
-19:32 UTC status check. Output-cache changes apply to future jobs and do not
-interrupt or modify either active job.
+limit. Windows remains running as of the 20:32 UTC status check. The independent
+first Linux job has finished at its configured time limit, documented below.
+Output-cache changes apply to future jobs and do not modify an active job.
+
+## Linux attempt 1 — measured configured execution limit
+
+Run [39041366048](https://github.com/atlasru/aether/actions/runs/39041366048),
+job 117421370388, source `2f7883f497a732b3d3d4b21a7f2e53dcece60793` prepared
+the source and Aether overlay, passed GN (35,794 targets / 5,027 files, 10,856 ms)
+and actually compiled `chrome chromedriver`. Its original workflow used two
+compiler jobs. The last native log reaches 33,275 / 65,046 operations after
+5h46m03.29s of compilation, without a native compiler/linker error found.
+
+GitHub's annotation states: "The job has exceeded the maximum execution time of
+5h55m0s". The job began 14:35:03 UTC, its build step was cancelled at 20:30:57,
+and the job finished 20:31:52 including evidence upload and cleanup. This proves
+the configured 355-minute job limit was reached. GitHub's hosted maximum is
+360 minutes; this is not proof that every configuration or incremental attempt
+on standard runners is impossible. No executable, linking success or runtime
+smoke result was produced. Aether-specific object compilation was not observed
+in the partial log; GN/source preparation alone does not validate its C++ APIs.
+
+Measured image 20261012.334.1: Ubuntu 24.04, Intel Xeon Platinum 8573C, 4 logical
+CPUs, 16,765,378,560 physical RAM bytes. After cleanup: 119,626,858,496 free disk
+bytes. Across 705 samples, minimum free disk was 94,567,948,288 bytes and minimum
+MemAvailable was 8,405,549,056 bytes. Final MemAvailable was 10,624,262,144 bytes.
+There is no disk/RAM exhaustion demonstrated. The capacity problem observed in
+this attempt is elapsed job time at this concurrency, not missing self-hosting.
+
+The full streamed build/resource evidence was downloaded from artifact
+[12113752055](https://github.com/atlasru/aether/actions/runs/39041366048/artifacts/12113752055)
+and inspected when the job-log connector returned Transport closed. Durable
+hardware reports, exact annotations, native summary and excerpt are in
+[docs/builds/attempt-1-linux/](docs/builds/attempt-1-linux/).
+The follow-up Linux request uses four compiler jobs and the new resumable output
+cache. Its first pass will create a cache; the old job uploaded logs, not objects.
+Windows attempt 4 continues independently. No faster-build claim is made before
+that retry is measured.
 
 ## Local incremental-tooling verification
 

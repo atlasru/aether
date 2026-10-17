@@ -1,0 +1,33 @@
+{
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "target": "linux",
+  "free_disk_bytes": 119626858496,
+  "physical_memory_bytes": 16765378560,
+  "tools": {
+    "git": "/usr/bin/git",
+    "python3": "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3",
+    "patch": "/usr/bin/patch",
+    "clang++": "/usr/bin/clang++",
+    "g++": "/usr/bin/g++",
+    "ninja": "/usr/local/bin/ninja",
+    "docker": "/usr/bin/docker"
+  },
+  "blockers": [
+    "At least 120 GiB free disk required by Aether build preflight",
+    "At least 16 GiB RAM required by Aether build preflight"
+  ],
+  "ready": false,
+  "time": "2026-10-17T14:37:50.513425+00:00",
+  "cpu_count": 4,
+  "runner_image": "20261012.334.1",
+  "runner_os": "Linux",
+  "system": {
+    "command": [
+      "bash",
+      "-c",
+      "df -B1; free -b; lscpu; cat /proc/meminfo | head -8"
+    ],
+    "exit_code": 0,
+    "output": "Filesystem        1B-blocks        Used    Available Use% Mounted on\n/dev/root      154894188544 35250552832 119626858496  23% /\ntmpfs            8382689280       86016   8382603264   1% /dev/shm\ntmpfs            3353075712     1028096   3352047616   1% /run\ntmpfs               5242880           0      5242880   0% /run/lock\n/dev/sda16        923156480    66572288    791941120   8% /boot\n/dev/sda15        109395456     6399488    102995968   6% /boot/efi\ntmpfs            1676537856       12288   1676525568   1% /run/user/1001\n               total        used        free      shared  buff/cache   available\nMem:     16765378560  1000148992 12898488320    48644096  3256373248 15765229568\nSwap:     3221221376           0  3221221376\nArchitecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               GenuineIntel\nModel name:                              INTEL(R) XEON(R) PLATINUM 8573C\nCPU family:                              6\nModel:                                   207\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                2\nCPU(s) scaling MHz:                      130%\nCPU max MHz:                             2300.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4600.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves vnmi avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid fsrm arch_capabilities\nVirtualization:                          VT-x\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               96 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                4 MiB (2 instances)\nL3 cache:                                260 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Mitigation; Aligned branch/return thunks\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Vulnerable\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Retpoline\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown\nVulnerability Vmscape:                   Not affected\nMemTotal:       16372440 kB\nMemFree:        12595788 kB\nMemAvailable:   15395340 kB\nBuffers:          569140 kB\nCached:          2482540 kB\nSwapCached:            0 kB\nActive:           803164 kB\nInactive:        2536700 kB\n"
+  }
+}

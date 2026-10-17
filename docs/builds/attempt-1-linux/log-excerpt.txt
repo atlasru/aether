@@ -1,0 +1,20 @@
+Applied Aether: 1450 files, b87dc4d657353b6fca778c10abfed78587d579cd6808f203448648f9624a71ee
+Done. Made 35794 targets from 5027 files in 10856ms
+AETHER: starting real Linux compilation: chrome chromedriver
+ninja: Entering directory `/home/runner/work/_temp/aether/linux/build/src/out/Default'
+[33267/65048] 5h45m55.22s F CXX obj/content/browser/browser/save_package_serialization_handler.o
+[33268/65048] 5h45m55.22s S CXX obj/third_party/pdfium/core/fpdfapi/cmaps/cmaps/UniGB-UCS2-V_4.o
+[33268/65048] 5h45m55.51s F CXX obj/content/browser/browser/save_types.o
+[33269/65048] 5h45m55.51s S CXX obj/third_party/pdfium/core/fpdfapi/cmaps/cmaps/83pv-RKSJ-H_1.o
+[33269/65048] 5h45m55.67s F CXX obj/content/browser/browser/save_package.o
+[33270/65047] 5h45m55.67s S CXX obj/third_party/blink/renderer/core/animation/animation/svg_path_seg_interpolation_functions.o
+[33270/65047] 5h45m56.56s F CXX obj/content/browser/browser/fenced_document_data.o
+[33271/65046] 5h45m56.57s S CXX obj/third_party/pdfium/fpdfsdk/fpdfxfa/fpdfxfa/cpdfxfa_widget.o
+[33271/65046] 5h45m59.71s F CXX obj/content/browser/browser/feature_observer.o
+[33272/65046] 5h45m59.71s S CXX obj/third_party/pdfium/fpdfsdk/fpdfxfa/fpdfxfa/cpdfxfa_page.o
+[33272/65046] 5h46m00.51s F CXX obj/content/browser/browser/automatic_beacon_info.o
+[33273/65046] 5h46m00.51s S COPY gen/chrome/browser/ui/webui/default_browser/default_browser_modal.mojom-webui.ts gen/chrome/browser/resources/default_browser/default_browser_modal/preprocessed/default_browser_modal.mojom-webui.ts
+[33273/65046] 5h46m00.51s F COPY gen/chrome/browser/ui/webui/default_browser/default_browser_modal.mojom-webui.ts gen/chrome/browser/resources/default_browser/default_browser_modal/preprocessed/default_browser_modal.mojom-webui.ts
+[33274/65046] 5h46m00.51s S CXX obj/third_party/pdfium/fpdfsdk/fpdfxfa/fpdfxfa/cpdfxfa_docenvironment.o
+[33274/65046] 5h46m03.29s F CXX obj/content/browser/browser/fenced_frame_config.o
+[33275/65046] 5h46m03.29s S CXX obj/third_party/pdfium/fpdfsdk/fpdfxfa/fpdfxfa/cpdfxfa_context.o

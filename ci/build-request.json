@@ -1,8 +1,8 @@
 {
-  "attempt": 4,
-  "purpose": "Fix actual Windows Clang PCH/module failure and UTF-8 build logging; retry full browser compilation",
+  "attempt": 5,
+  "purpose": "Retry real Linux Chromium compilation with four workers and resumable outputs after observed 355-minute job cap",
   "platforms": [
-    "windows"
+    "linux"
   ],
   "configuration": "release component, no symbols, PGO or ThinLTO; browser and driver only"
 }
