@@ -73,7 +73,7 @@ Linux compilation and packaging are not validated yet. See [DEVELOPMENT.md](DEVE
 run on pushes/PRs: portable tests, actual GRIT resource compilation and exact
 Windows/Linux sparse patch checks. [Compile Aether browser](https://github.com/atlasru/aether/actions/workflows/build.yml)
 uses GitHub-hosted `windows-2025-vs2026` and `ubuntu-24.04` runners. A push changing
-`ci/build-request.json` on `dev` starts both builds. Manual dispatch can select a
+`ci/build-request.json` on `dev` starts its selected Windows/Linux platforms. Manual dispatch can select a
 platform and an existing larger-runner label. Full Chromium compilation runs,
 regardless of the advisory preflight's disk/RAM warnings (`--attempt`).
 

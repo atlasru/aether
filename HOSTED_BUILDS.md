@@ -89,3 +89,20 @@ an escaped backspace; the raw-string fix is included for the retry.
 Measured reports and error excerpt: [docs/builds/attempt-1-windows/](docs/builds/attempt-1-windows/).
 The full streamed log/samples are in the run's build-evidence artifact. No browser
 executable or runtime smoke result was produced by this failed Windows attempt.
+
+## Attempt 2 — observed SDK mismatch
+
+Run [39043691087](https://github.com/atlasru/aether/actions/runs/39043691087),
+source `a034f6e15c1bbf4d33a5c6f0c1d1bc76f3c38b0d`, selected D:/aether and measured
+236,075,773,952 free bytes. Early runner evidence confirms that SDK Include has
+only `10.0.26100.0`. Pinned Chromium build/vs_toolchain.py and
+build/toolchain/win/setup_toolchain.py both explicitly select `10.0.28000.0`.
+This is a measured toolchain mismatch; no GN/compiler failure is invented for it.
+The next requested Windows build supersedes the incompatible in-progress job.
+
+Attempt 3 installs Microsoft SDK servicing release 10.0.28000.2526 (above the
+2270 minimum), with vendor URL and SHA-256 pinned from Microsoft's winget
+manifest, plus Authenticode verification. Installation logs, exit status and
+required header/library/tool checks are retained. This change has not yet been
+verified on the runner. New build requests supersede older builds per platform;
+they do not cancel the other platform's independent attempt.

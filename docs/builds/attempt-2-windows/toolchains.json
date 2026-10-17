@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe",
+      "-all",
+      "-format",
+      "json"
+    ],
+    "exit_code": 0,
+    "output": "[\n  {\n    \"instanceId\": \"d2e552a4\",\n    \"installDate\": \"2026-10-07T22:18:56Z\",\n    \"installationName\": \"VisualStudio/18.10.3+12224.181\",\n    \"installationPath\": \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Enterprise\",\n    \"installationVersion\": \"18.10.12224.181\",\n    \"productId\": \"Microsoft.VisualStudio.Product.Enterprise\",\n    \"productPath\": \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Enterprise\\\\Common7\\\\IDE\\\\devenv.exe\",\n    \"state\": 4294967295,\n    \"isComplete\": true,\n    \"isLaunchable\": true,\n    \"isPrerelease\": false,\n    \"isRebootRequired\": false,\n    \"displayName\": \"Visual Studio Enterprise 2026\",\n    \"description\": \"Built for scale, security, and speed \u2013 the IDE for complex, high-impact development.\",\n    \"channelId\": \"VisualStudio.18.Release\",\n    \"channelUri\": \"https://aka.ms/vs/18/stable/channel\",\n    \"enginePath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\Installer\\\\resources\\\\app\\\\ServiceHub\\\\Services\\\\Microsoft.VisualStudio.Setup.Service\",\n    \"expirationDate\": \"2027-03-23T17:00:00+00:00\",\n    \"installChannelUri\": \"https://aka.ms/vs/18/stable/channel\",\n    \"installedChannelId\": \"VisualStudio.18.Release\",\n    \"installedChannelUri\": \"https://aka.ms/vs/18/stable/channel\",\n    \"releaseNotes\": \"https://docs.microsoft.com/en-us/visualstudio/releases/18/release-notes-v18.10#18.10.3\",\n    \"resolvedInstallationPath\": \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Enterprise\",\n    \"thirdPartyNotices\": \"https://go.microsoft.com/fwlink/?LinkId=661480\",\n    \"updateDate\": \"2026-10-07T22:18:56.6061842Z\",\n    \"catalog\": {\n      \"buildBranch\": \"stable\",\n      \"buildVersion\": \"18.10.12224.181\",\n      \"featureReleaseMonth\": \"09\",\n      \"featureReleaseYear\": \"2026\",\n      \"id\": \"VisualStudio/18.10.3+12224.181\",\n      \"includeBuildVersionInDisplayVersion\": \"False\",\n      \"localBuild\": \"build-lab\",\n      \"manifestName\": \"VisualStudio\",\n      \"manifestType\": \"installer\",\n      \"productDisplayVersion\": \"18.10.3\",\n      \"productLine\": \"Dev18\",\n      \"productLineVersion\": \"18\",\n      \"productMilestone\": \"RTW\",\n      \"productMilestoneIsPreRelease\": \"False\",\n      \"productName\": \"Visual Studio\",\n      \"productPatchVersion\": \"3\",\n      \"productPreReleaseMilestoneSuffix\": \"1.0\",\n      \"productRelease\": \"RTW\",\n      \"productSemanticVersion\": \"18.10.3+12224.181\",\n      \"requiredEngineVersion\": \"4.10.30.62513\"\n    },\n    \"properties\": {\n      \"campaignId\": \"\",\n      \"channelManifestId\": \"VisualStudio.18.Release/18.10.3+12224.181\",\n      \"includeRecommended\": \"1\",\n      \"nickname\": \"\",\n      \"setupEngineFilePath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\Installer\\\\setup.exe\"\n    }\n  }\n]\n"
+  },
+  {
+    "command": [
+      "powershell",
+      "-NoProfile",
+      "-Command",
+      "Get-ChildItem 'C:\\Program Files (x86)\\Windows Kits\\10\\Include' | Select-Object Name | ConvertTo-Json"
+    ],
+    "exit_code": 0,
+    "output": "{\n    \"Name\":  \"10.0.26100.0\"\n}\n"
+  },
+  {
+    "command": [
+      "compact.exe",
+      "/C",
+      "/I",
+      "D:\\aether"
+    ],
+    "exit_code": 0,
+    "output": "\n Compressing files in D:\\\n\naether                      0 :         0 = 1.0 to 1 [OK]\n\n1 files within 1 directories were compressed.\n0 total bytes of data are stored in 0 bytes.\nThe compression ratio is 1.0 to 1.\n"
+  }
+]

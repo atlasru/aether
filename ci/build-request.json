@@ -1,6 +1,6 @@
 {
-  "attempt": 2,
-  "purpose": "Retry actual browser compilation after fixing Windows spawn imports; choose measured free volume (D: has 236 GB in attempt 1)",
+  "attempt": 3,
+  "purpose": "Install verified Microsoft Windows SDK 28000 before full Chromium build; supersede SDK-incompatible Windows attempt 2",
   "platforms": [
     "windows"
   ],

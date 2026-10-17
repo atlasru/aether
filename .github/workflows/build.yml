@@ -52,7 +52,7 @@ jobs:
     needs: request
     concurrency:
       group: compile-${{ github.ref }}-${{ matrix.platform }}
-      cancel-in-progress: false
+      cancel-in-progress: true
     name: Real Chromium build (${{ matrix.platform }})
     strategy:
       fail-fast: false
@@ -77,6 +77,11 @@ jobs:
       - name: Measure hardware, preserve toolchains and free disposable image packages
         shell: bash
         run: python scripts/hosted.py prepare ${{ matrix.platform }} --work-dir "$AETHER_WORK_DIR"
+      - name: Install hash-pinned Microsoft SDK required by this Chromium revision
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        timeout-minutes: 20
+        run: ./scripts/install_windows_sdk.ps1
       - name: Preserve initial measured runner capacity before the long build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
