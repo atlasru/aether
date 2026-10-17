@@ -26,6 +26,7 @@ jobs:
     outputs:
       platforms: ${{ steps.select.outputs.platforms }}
       queue: ${{ steps.select.outputs.queue }}
+      source_sha: ${{ steps.select.outputs.source_sha }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -36,7 +37,7 @@ jobs:
           REQUESTED_PLATFORM: ${{ inputs.platform || 'both' }}
         run: |
           python3 - <<'PYTHON'
-          import json, os
+          import json, os, subprocess
           from pathlib import Path
           selected = os.environ['REQUESTED_PLATFORM']
           request = json.loads(Path('ci/build-request.json').read_text())
@@ -54,6 +55,7 @@ jobs:
           with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
               out.write('platforms=' + json.dumps(platforms) + '\n')
               out.write('queue=' + str(queued).lower() + '\n')
+              out.write('source_sha=' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() + '\n')
           PYTHON
   browser:
     needs: request
@@ -79,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: ${{ inputs.source_ref || github.sha }}
+          ref: ${{ needs.request.outputs.source_sha }}
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:

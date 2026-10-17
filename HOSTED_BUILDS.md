@@ -286,11 +286,23 @@ checkpoint; source/guard checks and a real queued native dispatch are verified
 separately. Inspect-build's queue request is an actual native workflow dispatch,
 not a fabricated compiler completion.
 
-The first real dispatch test returned HTTP 422 because GitHub validates inputs
-against the default-branch workflow's legacy schema. The corrected dispatcher
+The first real dispatch test returned HTTP 422 when additional runner/continuation inputs were sent. The corrected dispatcher
 sends only its registered source_ref/platform fields and dispatches Windows and
 Linux separately. Dispatch-created jobs queue behind active work. The bounded
 counter is stored in the output cache with its source fingerprint; explicit
 push requests or new source reset it. Invalid counters disable automatic
 continuation. The correction awaits a real API re-test; no successful queued
 successor is claimed from the failed dispatch.
+
+The corrected real dispatch test succeeded in inspection run 39074404730.
+Windows and Linux successors were actually queued (39074421992 / 39074423167)
+behind the still-running native jobs. Guard/source CI 39074404684 passed all
+three jobs, including 17 Python tests. This verifies service dispatch and queue
+behavior, not the as-yet-unreached native cache checkpoint path.
+
+A following hardening keeps the continuation bound when caches are evicted:
+automatic pinned-source passes disable further auto-continuation if their
+matching cached counter is missing or invalid. Explicit requests initialize a
+fresh bound. The request job resolves a branch to a commit once and browser jobs
+checkout that exact selected SHA. Queued, not-yet-started diagnostic successors
+are superseded by the hardened version; active compilation is preserved.

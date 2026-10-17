@@ -77,7 +77,12 @@ can dispatch another pinned-source pass (maximum four continuations). Compiler
 errors stop. New guard tests and the queued dispatch are awaiting CI verification;
 a cache-driven end-to-end native continuation is not yet verified.
 
-The initial native successor API test returned HTTP 422 (legacy default-branch
-input schema). Dispatch compatibility is being re-tested with only registered
+The initial native successor API test returned HTTP 422 with additional dispatch inputs. Dispatch compatibility is being re-tested with only registered
 source_ref/platform fields and cache-persisted bounded counters. No successful
 automatic native checkpoint chain is yet claimed.
+
+Actual service dispatch and queuing passed (inspection run 39074404730) and source
+CI 39074404684 passed 17 Python tests plus the existing checks. The next guard
+hardening prevents a lost/evicted cursor from resetting the automatic bound.
+The native cache checkpoint path remains unverified until a real compile window
+finishes and saves its cache. No linked browser is claimed.

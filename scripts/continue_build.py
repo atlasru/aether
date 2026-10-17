@@ -31,7 +31,7 @@ def checkpoint_count(cursor, source_fingerprint, explicit):
     if not isinstance(cursor, dict):
         return MAX_CONTINUATIONS
     if cursor.get("source_fingerprint") != source_fingerprint:
-        return 0
+        return MAX_CONTINUATIONS
     count = cursor.get("next_count")
     return count if type(count) is int and 0 <= count <= MAX_CONTINUATIONS else MAX_CONTINUATIONS
 
@@ -89,7 +89,7 @@ def api(path, body=None):
         detail = error.read().decode("utf-8", "replace")[:3000]
         raise RuntimeError(f"GitHub API {error.code}: {detail}") from None
 
-def dispatch(platform):
+def dispatch(platform, *, explicit=False):
     source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     if not re.fullmatch("[0-9a-f]{40}", source):
         raise ValueError("A pinned source commit is required")
@@ -108,7 +108,7 @@ def dispatch(platform):
     # Keep continuation state inside the verified output cache, not extra inputs.
     for selected in (("windows", "linux") if platform == "both" else (platform,)):
         api("/actions/workflows/build.yml/dispatches", {
-            "ref": "dev", "inputs": {"source_ref": source, "platform": selected}})
+            "ref": "dev", "inputs": {"source_ref": "dev" if explicit else source, "platform": selected}})
         print(json.dumps({"dispatch_accepted": True, "source_ref": source, "platform": selected}))
 
 def resume(platform, key):
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--cache-key", default="")
     args = parser.parse_args()
     if args.queue:
-        dispatch(args.platform)
+        dispatch(args.platform, explicit=True)
     elif args.platform == "both":
         parser.error("checkpoint continuation requires one platform")
     else:

@@ -26,7 +26,9 @@ class ContinuationTest(unittest.TestCase):
         cursor = {"source_fingerprint": "same", "next_count": 3}
         self.assertEqual(checkpoint_count(cursor, "same", False), 3)
         self.assertEqual(checkpoint_count(cursor, "same", True), 0)
-        self.assertEqual(checkpoint_count(cursor, "changed", False), 0)
+        self.assertEqual(checkpoint_count(cursor, "changed", False), 4)
+        self.assertEqual(checkpoint_count({}, "same", False), 4)
+        self.assertEqual(checkpoint_count({}, "same", True), 0)
     def test_corrupt_counter_stops_automatic_progression(self):
         self.assertEqual(checkpoint_count([], "same", False), 4)
         for value in (-1, 6, "2", True):
