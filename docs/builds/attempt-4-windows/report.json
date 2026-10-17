@@ -1,0 +1,159 @@
+{
+  "job_id": 117439846926,
+  "annotations": [
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/atlasru/aether/blob/598df4d741af4c37fc7457814f84690031b62cc6/.github",
+      "start_line": 1,
+      "start_column": null,
+      "end_line": 1,
+      "end_column": null,
+      "annotation_level": "failure",
+      "title": "",
+      "message": "The job has exceeded the maximum execution time of 5h55m0s",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/atlasru/aether/blob/598df4d741af4c37fc7457814f84690031b62cc6/.github",
+      "start_line": 2,
+      "start_column": null,
+      "end_line": 2,
+      "end_column": null,
+      "annotation_level": "warning",
+      "title": "",
+      "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/atlasru/aether/blob/598df4d741af4c37fc7457814f84690031b62cc6/.github",
+      "start_line": 67080,
+      "start_column": null,
+      "end_line": 67080,
+      "end_column": null,
+      "annotation_level": "failure",
+      "title": "",
+      "message": "The operation was canceled.",
+      "raw_details": ""
+    }
+  ],
+  "stages": [
+    "Applied Aether: 1454 files, 113672482a1a76054dc2513a86e035d184e751280286b54cbe71f61adab646c8",
+    "Done. Made 35610 targets from 5000 files in 57484ms",
+    "AETHER: starting real Windows compilation: chrome chromedriver",
+    "ninja: Entering directory `out\\Default'"
+  ],
+  "last_progress": [
+    "[27092/70804] 5h30m30.71s - CXX obj/components/webrtc/net_address_utils/net_address_utils.obj"
+  ],
+  "errors": [
+    "FAILED: c7de4fe1-b5ed-4c8b-8d1d-5f3d3260ee08 \"./obj/services/network/public/mojom/mojom_blink/p2p_trusted.mojom-blink.obj\" CXX obj/services/network/public/mojom/mojom_blink/p2p_trusted.mojom-blink.obj",
+    "FAILED: 813a4a20-8eb4-4de5-bf2b-d208ccf0d218 \"./obj/third_party/blink/renderer/platform/network/network/http_names.obj\" CXX obj/third_party/blink/renderer/platform/network/network/http_names.obj",
+    "FAILED: 85081391-e27d-4a32-b115-2f97c662ac1f \"./obj/third_party/blink/renderer/platform/media/media_final/watch_time_reporter.obj\" CXX obj/third_party/blink/renderer/platform/media/media_final/watch_time_reporter.obj",
+    "FAILED: db40d22b-a774-48b3-95d4-2b57afdc4e79 \"./obj/services/network/public/mojom/mojom_host_resolver_blink/host_resolver.mojom-blink.obj\" CXX obj/services/network/public/mojom/mojom_host_resolver_blink/host_resolver.mojom-blink.obj"
+  ],
+  "aether_objects": [],
+  "tail": [
+    "[27092/70804] 5h30m30.71s - CXX obj/components/payments/mojom/mojom_blink/payment_request_data.mojom-blink.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/components/autofill/core/browser/country_data/country_data.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/components/strike_database/features/strike_database_features.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/ui/latency/mojom/mojom_blink/latency_info.mojom-blink.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/components/feature_engagement/public/feature_constants/feature_list.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/ui/actions/actions/actions.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/services/proxy_resolver/public/mojom/mojom_blink/proxy_resolver.mojom-blink.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/third_party/blink/renderer/platform/blob/blob/blob_bytes_provider.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/third_party/blink/renderer/platform/heap/heap/blink_gc_memory_dump_provider.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/services/device/public/cpp/device_features/device_features.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/components/safe_browsing/core/browser/db/sb_protocol_config/sb_protocol_config.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/services/device/public/mojom/geolocation_internals/geolocation_internals.mojom.obj",
+    "[27092/70804] 5h30m30.71s - CXX obj/components/webrtc/net_address_utils/net_address_utils.obj",
+    "build failed",
+    "",
+    "\t",
+    "noexec:119 local:26973 remote:0 cache:0 skip:16489",
+    "  cache-write:0(err:0) fallback:0 retry:0",
+    "fs: ops: 558574(err:80759) / r:161114(err:0) 8.01GiB / w:2251(err:0) 44.27MiB",
+    "",
+    "",
+    " resource/capa   used(err)  wait-avg |   s m |  serv-avg |   s m |",
+    "   localexec/4 24338(2041) 27m39.91s |▂▂▂▂▂▄█|     3.22s |▂▂▃█▂▂ |",
+    " pool=action/4     4232(0)    16.92s |█▂▃▃▂▃ |     2.23s | ▂█▇▂▂ |"
+  ],
+  "resource_samples": 604,
+  "minimum_free_disk_bytes": 207936643072,
+  "minimum_available_memory_bytes": 7788654592,
+  "final_sample": {
+    "host": "Windows-2025Server-10.0.26100-SP0",
+    "target": "windows",
+    "free_disk_bytes": 212204720128,
+    "physical_memory_bytes": 17174360064,
+    "tools": {
+      "git": "C:\\Program Files\\Git\\ucrt64\\bin\\git.EXE",
+      "python3": "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python3.EXE",
+      "patch": "C:\\Program Files\\Git\\usr\\bin\\patch.EXE",
+      "clang++": "C:\\Program Files\\LLVM\\bin\\clang++.EXE",
+      "g++": "C:\\mingw64\\bin\\g++.EXE",
+      "ninja": "C:\\ProgramData\\Chocolatey\\bin\\ninja.EXE",
+      "docker": "C:\\Windows\\system32\\docker.EXE"
+    },
+    "blockers": [
+      "At least 16 GiB RAM required by Aether build preflight"
+    ],
+    "ready": false,
+    "time": "2026-10-17T21:59:18.164730+00:00",
+    "cpu_count": 4,
+    "runner_image": "20261007.264.1",
+    "runner_os": "Windows",
+    "system": {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; Get-Volume | Select-Object DriveLetter,FileSystem,Size,SizeRemaining | ConvertTo-Json"
+      ],
+      "exit_code": 0,
+      "output": "{\n    \"TotalVisibleMemorySize\":  16771836,\n    \"FreePhysicalMemory\":  10599592\n}\n[\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"FAT32\",\n        \"Size\":  99614720,\n        \"SizeRemaining\":  63645184\n    },\n    {\n        \"DriveLetter\":  \"C\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  160467759104,\n        \"SizeRemaining\":  32996220928\n    },\n    {\n        \"DriveLetter\":  \"D\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  236205371392,\n        \"SizeRemaining\":  212204269568\n    },\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  471855104,\n        \"SizeRemaining\":  457297920\n    }\n]\n"
+    }
+  },
+  "after_cleanup": {
+    "host": "Windows-2025Server-10.0.26100-SP0",
+    "target": "windows",
+    "free_disk_bytes": 236075810816,
+    "physical_memory_bytes": 17174360064,
+    "tools": {
+      "git": "C:\\Program Files\\Git\\ucrt64\\bin\\git.EXE",
+      "python3": "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python3.EXE",
+      "patch": "C:\\Program Files\\Git\\usr\\bin\\patch.EXE",
+      "clang++": "C:\\Program Files\\LLVM\\bin\\clang++.EXE",
+      "g++": "C:\\mingw64\\bin\\g++.EXE",
+      "ninja": "C:\\ProgramData\\Chocolatey\\bin\\ninja.EXE",
+      "docker": "C:\\Windows\\system32\\docker.EXE"
+    },
+    "blockers": [
+      "At least 16 GiB RAM required by Aether build preflight"
+    ],
+    "ready": false,
+    "time": "2026-10-17T16:10:15.691262+00:00",
+    "cpu_count": 4,
+    "runner_image": "20261007.264.1",
+    "runner_os": "Windows",
+    "system": {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; Get-Volume | Select-Object DriveLetter,FileSystem,Size,SizeRemaining | ConvertTo-Json"
+      ],
+      "exit_code": 0,
+      "output": "{\n    \"TotalVisibleMemorySize\":  16771836,\n    \"FreePhysicalMemory\":  14066820\n}\n[\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"FAT32\",\n        \"Size\":  99614720,\n        \"SizeRemaining\":  63649280\n    },\n    {\n        \"DriveLetter\":  \"C\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  160467759104,\n        \"SizeRemaining\":  44316807168\n    },\n    {\n        \"DriveLetter\":  \"D\",\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  236205371392,\n        \"SizeRemaining\":  236075810816\n    },\n    {\n        \"DriveLetter\":  null,\n        \"FileSystem\":  \"NTFS\",\n        \"Size\":  471855104,\n        \"SizeRemaining\":  457297920\n    }\n]\n"
+    }
+  },
+  "run_url": "https://github.com/atlasru/aether/actions/runs/39047759315",
+  "source_sha": "598df4d741af4c37fc7457814f84690031b62cc6",
+  "artifact_id": 12116415347,
+  "artifact_sha256": "42d8aa5f10afeb802926e98d00db9ed0556b0729fa94ea0c97a644dd4be299c9",
+  "inspection_run": 39073497261,
+  "compiled_browser_verified": false,
+  "scope": "Actual native compilation stopped at configured 355-minute job limit; no disk/RAM exhaustion demonstrated"
+}

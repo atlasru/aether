@@ -1,8 +1,8 @@
 {
-  "attempt": 5,
-  "purpose": "Retry real Linux Chromium compilation with four workers and resumable outputs after observed 355-minute job cap",
+  "attempt": 6,
+  "purpose": "Retry real Windows compilation after measured 355-minute limit, using resumable outputs and extracted-bundle validation",
   "platforms": [
-    "linux"
+    "windows"
   ],
   "configuration": "release component, no symbols, PGO or ThinLTO; browser and driver only"
 }

@@ -236,3 +236,32 @@ hash-gated timestamp restoration fixes that measured behavior. This is a local
 build-tool test, not an Aether executable or a GitHub cache-service verification.
 Siso quiet mode plus 30-second heartbeats is supported by this pinned binary;
 hosted attempts retain command diagnostics without per-operation console spam.
+
+## Windows attempt 4 — verified configured execution limit
+
+The full artifact from run 39047759315 was inspected through hosted diagnostic
+run [39073497261](https://github.com/atlasru/aether/actions/runs/39073497261);
+the large raw job-log endpoint returned Transport closed. GitHub records:
+"The job has exceeded the maximum execution time of 5h55m0s".
+Job 117439846926 ran from 16:03:50 to 21:59:59 UTC including cleanup.
+
+The final native counter is 27,092 / 70,804 after 5h30m30.71s:
+26,973 local operations, 119 noexec, 16,489 skipped when interrupted.
+Four active CXX commands were marked FAILED during cancellation, with no separate
+C++ error diagnostic found. PCH and UTF-8 fixes allowed sustained compilation;
+Aether-owned preferences/handler object compilation was not observed in the log.
+No linked working browser or runtime smoke pass is verified.
+
+604 resource samples: minimum free D: disk 207,936,643,072 bytes; minimum available
+physical memory 7,788,654,592 bytes. Final free D: was 212,204,720,128 bytes.
+This attempt reached elapsed job time with spare disk/RAM; it does not prove
+that every standard-runner configuration or incremental build is impossible.
+The configured limit was 355 minutes, within GitHub's 360-minute hosted maximum.
+
+Permanent report, exact annotations and excerpt:
+[docs/builds/attempt-4-windows/](docs/builds/attempt-4-windows/).
+Raw artifact [12116415347](https://github.com/atlasru/aether/actions/runs/39047759315/artifacts/12116415347).
+A fresh Windows request now uses compatible output caching, hash-gated input
+timestamps and a compile checkpoint window. The old attempt retained logs, not
+objects. Linux retry 39067527723 continues independently with four workers.
+No executable build success or native-browser cache round trip is claimed yet.

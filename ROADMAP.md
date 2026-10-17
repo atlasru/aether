@@ -62,3 +62,11 @@ browser executable or runtime smoke success is yet confirmed.
 Future builds smoke-test the extracted runtime archive and record its checksum;
 archive IO/path checks are local tooling tests, not native-browser smoke passes.
 See [HOSTED_BUILDS.md](HOSTED_BUILDS.md) for measurements, run links and exact scope.
+
+Windows attempt 4 has now reached the configured 355-minute job limit:
+27,092/70,804 operations, 26,973 local. 604 samples show at least 193.7 GiB
+free disk and 7.25 GiB available physical RAM. Four running commands were
+interrupted; no separate compiler diagnostic was found. Windows attempt 5 is
+requested with resumable outputs and extracted-bundle smoke validation.
+Linux retry 39067527723 remains running. Neither platform has a verified browser
+executable yet. Detailed immutable run/artifact links are in HOSTED_BUILDS.md.

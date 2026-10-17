@@ -58,3 +58,10 @@ output caching. Latest reviewed source CI: [39065460460](https://github.com/atla
 at `fbe8383a38d0ee91279947fd4dd0675fefd83e81`, all three jobs passed.
 [HOSTED_BUILDS.md](HOSTED_BUILDS.md) records
 measurements and durable evidence. No working executable is claimed yet.
+
+Windows attempt 4 final result: configured 355-minute job limit, confirmed by
+GitHub's exact timeout annotation. The native counter reached 27,092/70,804 with
+26,973 local operations. The complete preserved log was inspected in diagnostic
+run 39073497261. The inspection workflow's success means evidence was read,
+not that a browser built. No working executable or browser smoke pass is claimed.
+Windows retry is requested; Linux retry remains active.
