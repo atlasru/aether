@@ -22,6 +22,14 @@ from common import ROOT
 from doctor import inspect
 
 
+def configure_console():
+    # Siso emits Unicode resource charts even when Windows defaults to cp1252.
+    # A diagnostic must never abort the compiler's log stream.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def command(args):
     try:
         result = subprocess.run(args, text=True, encoding="utf-8", errors="replace",
@@ -104,6 +112,7 @@ def prepare(target, work):
 
 
 def build(target, work, jobs):
+    configure_console()
     evidence = ROOT / "dist/hosted"
     evidence.mkdir(parents=True, exist_ok=True)
     args = [sys.executable, "-u", str(ROOT / "scripts/build.py"), target,
@@ -125,9 +134,9 @@ def build(target, work, jobs):
     try:
         with (evidence / "build.log").open("w", encoding="utf-8") as stream:
             for line in process.stdout:
-                print(line, end="", flush=True)
                 stream.write(line)
                 stream.flush()
+                print(line, end="", flush=True)
         result = process.wait()
     finally:
         stop.set()
@@ -145,6 +154,7 @@ def build(target, work, jobs):
 
 
 if __name__ == "__main__":
+    configure_console()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("select-path", "prepare", "build"))
     parser.add_argument("platform", choices=("windows", "linux"))

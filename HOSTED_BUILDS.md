@@ -115,3 +115,28 @@ Run 39044290753 (source `194b0c841026298f6eb81c47a32b765abfbb28bb`) continues
 the full browser build after this successful installation. Its initial artifact
 contains SDK installer logs; the final build-evidence artifact will contain the
 actual compilation result. First Linux attempt 39041366048 remains independent.
+
+## Attempt 3 — real C++ compilation, PCH failure
+
+The Windows source preparation and Aether overlay completed (1,454 files).
+GN succeeded: 35,610 targets from 5,000 files in 37,478 ms. The actual
+`autoninja -C out/Default -j 4 chrome chromedriver` then ran the bundled Clang.
+Siso completed 1,889 of 82,373 operations (1,857 local, 32 noexec), before
+`base/precompile.cc` failed: missing 'export module' declaration in module
+interface unit. This is a real compiler failure, not sparse patch validation.
+
+The component configuration enabled precompiled headers by default; attempt 4
+sets Chromium's supported `enable_precompiled_headers=false`. The normal
+official configuration already disables PCH. No engine/security source changes
+are made for this correction. Pinned declaration: build/config/pch.gni.
+
+A second defect occurred while printing Siso's Unicode resource chart:
+Python's Windows cp1252 stdout raised UnicodeEncodeError. UTF-8 is now explicit
+for the hosted process and child Python environment, and a subprocess regression
+forces cp1252 to exercise that failure mode. The streamed file receives each
+line before console output. These new corrections await the next CI execution.
+
+The last console sample still had 138,612,543,488 bytes free on D:. No RAM, disk
+or hosted time-limit failure was demonstrated in this Windows attempt.
+No browser executable was produced. Native result and exact failed target:
+[docs/builds/attempt-3-windows/native-result.json](docs/builds/attempt-3-windows/native-result.json).

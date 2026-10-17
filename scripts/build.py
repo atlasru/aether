@@ -91,6 +91,9 @@ def gn_arguments(platform_root, target, *, low_resource=False):
     if target == "windows":
         # No Helium signing identities or feed trust are inherited from env.
         arguments["enable_winsparkle"] = "false"
+        # Chromium 155's Windows component PCH fails with the bundled Clang
+        # module-name flags (observed in base/precompile.cc on hosted attempt 3).
+        arguments["enable_precompiled_headers"] = "false"
     if os.environ.get("SISO_REAPI_ADDRESS"):
         raise RuntimeError("Remote compilation needs a separately reviewed Aether runner configuration")
     if shutil_which("sccache") and not low_resource:

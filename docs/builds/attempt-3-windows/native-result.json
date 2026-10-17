@@ -1,0 +1,26 @@
+{
+  "run": 39044290753,
+  "job": 117429855332,
+  "source_commit": "194b0c841026298f6eb81c47a32b765abfbb28bb",
+  "gn": {
+    "result": "passed",
+    "targets": 35610,
+    "files": 5000,
+    "elapsed_milliseconds": 37478
+  },
+  "compilation": {
+    "result": "failed",
+    "completed_operations": 1889,
+    "total_operations": 82373,
+    "local_operations": 1857,
+    "noexec_operations": 32,
+    "first_failed_output": "obj/base/base/precompile.cc.obj",
+    "error": "../../build/precompile.cc(1,1): error: missing 'export module' declaration in module interface unit",
+    "elapsed": "12m53.06s"
+  },
+  "secondary_logger_error": "UnicodeEncodeError: cp1252 cannot encode Siso resource chart",
+  "last_resource_console_sample": "2026-10-17T15:53:57.5332888Z AETHER RESOURCE: elapsed=1671.8s free_bytes=138612543488\r",
+  "infrastructure_limit_demonstrated": false,
+  "executable_produced": false,
+  "evidence_artifact": "https://github.com/atlasru/aether/actions/runs/39044290753/artifacts/12105933569"
+}

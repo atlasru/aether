@@ -18,7 +18,9 @@ The browser acceptance criteria are not met.**
 | Local Windows build preflight | Failed as expected | Linux host; about 30 GiB free disk and 9.7 GiB RAM; no Windows/VS/SDK |
 | Full hosted Windows/Linux build attempts | In progress | Actual source preparation/GN/compilation driver, not sparse validation |
 | Windows SDK installation | Passed on actual runner | Pinned SHA-256, Microsoft Authenticode, exit 0, required SDK files, Debugging Tools 10.0.28000.2526 |
-| Chromium GN/link/browser smoke | Result pending | No executable or browser smoke pass confirmed |
+| Windows Chromium GN | Passed on actual Windows runner | 35,610 targets / 5,000 files; --fail-on-unused-args |
+| Windows native C++ compilation | Failed after 1,889/82,373 operations | Clang base/precompile.cc PCH/module error; PCH correction and UTF-8 logger fix queued |
+| Browser link/smoke | Not reached on Windows | No executable or browser smoke pass confirmed |
 | Browser/installer/GUI/security validation | Not run | Native layout, downloads, extension compatibility, sandbox runtime, OS registration, DPI, accessibility and crash injection remain open |
 | Performance benchmarks | Not run | No browser comparison or performance claim |
 

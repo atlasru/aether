@@ -1,6 +1,6 @@
 {
-  "attempt": 3,
-  "purpose": "Install verified Microsoft Windows SDK 28000 before full Chromium build; supersede SDK-incompatible Windows attempt 2",
+  "attempt": 4,
+  "purpose": "Fix actual Windows Clang PCH/module failure and UTF-8 build logging; retry full browser compilation",
   "platforms": [
     "windows"
   ],
